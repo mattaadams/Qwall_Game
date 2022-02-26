@@ -15,7 +15,7 @@ class PlatformGame():
         self.settings = Settings()
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         self.clock = pygame.time.Clock()
-        self.man = Player(300, 600, 64, 64)
+        self.player = Player(300, 600, 64, 64)
 
     def run_game(self):
         while True:
@@ -30,32 +30,32 @@ class PlatformGame():
                 sys.exit()
 
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] and self.man.x > self.man.vel:
-            self.man.x -= self.man.vel
-            self.man.left = True
-            self.man.right = False
-        elif keys[pygame.K_RIGHT] and self.man.x < self.settings.screen_width - self.man.width - self.man.vel:
-            self.man.x += self.man.vel
-            self.man.left = False
-            self.man.right = True
+        if keys[pygame.K_LEFT] and self.player.x > self.player.vel:
+            self.player.x -= self.player.vel
+            self.player.left = True
+            self.player.right = False
+        elif keys[pygame.K_RIGHT] and self.player.x < self.settings.screen_width - self.player.width - self.player.vel:
+            self.player.x += self.player.vel
+            self.player.left = False
+            self.player.right = True
         else:
-            self.man.left = False
-            self.man.right = False
-            self.man.walkCount = 0
+            self.player.left = False
+            self.player.right = False
+            self.player.walkCount = 0
 
-        if not(self.man.isJump):
+        if not(self.player.isJump):
             if keys[pygame.K_SPACE]:
-                self.man.isJump = True
-                self.man.left = False
-                self.man.right = False
-                self.man.walkCount = 0
+                self.player.isJump = True
+                self.player.left = False
+                self.player.right = False
+                self.player.walkCount = 0
         else:
-            if self.man.jumpCount >= -10:
-                self.man.y -= (self.man.jumpCount * abs(self.man.jumpCount)) * 0.3
-                self.man.jumpCount -= 1
+            if self.player.jumpCount >= -10:
+                self.player.y -= (self.player.jumpCount * abs(self.player.jumpCount)) * 0.3
+                self.player.jumpCount -= 1
             else:
-                self.man.isJump = False
-                self.man.jumpCount = 10
+                self.player.isJump = False
+                self.player.jumpCount = 10
 
     def draw_grid(self):
         grid_range = self.settings.screen_width // self.settings.tile_size
@@ -72,7 +72,7 @@ class PlatformGame():
     def _update_screen(self):
         global walkCount
         self.screen.fill(self.settings.bg_color)
-        self.man.draw(self.screen)
+        self.player.draw(self.screen)
         self.draw_grid()
         pygame.display.update()
 
