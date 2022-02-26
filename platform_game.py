@@ -1,4 +1,5 @@
 import pygame
+import sys
 from animation import idle, walkLeft, walkRight
 from settings import Settings
 
@@ -10,13 +11,13 @@ from settings import Settings
 class PlatformGame():
     def __init__(self):
         pygame.init()
+        pygame.display.set_caption('Platform Game')
         self.settings = Settings()
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         self.clock = pygame.time.Clock()
         self.man = Player(300, 600, 64, 64)
 
     def run_game(self):
-        #run = True
         while True:
             self.clock.tick(27)
             self._check_events()
@@ -26,6 +27,7 @@ class PlatformGame():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                sys.exit()
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and self.man.x > self.man.vel:
