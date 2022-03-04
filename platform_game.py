@@ -1,8 +1,8 @@
 import pygame
 import sys
-from animation import idle, walkLeft, walkRight
+from animation import idle, walkLeft, walkRight, SpriteSheet
 from settings import Settings
-
+import math
 #clock = pygame.time.Clock()
 #win = pygame.display.set_mode((self.screen.screen_width, win_y))
 #pygame.display.set_caption("Untitled Platform Game")
@@ -15,7 +15,7 @@ class PlatformGame():
         self.settings = Settings()
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         self.clock = pygame.time.Clock()
-        self.player = Player(300, 600, 64, 64)
+        self.player = Player(300, 600, 35, 68)
 
     def run_game(self):
         while True:
@@ -89,19 +89,24 @@ class Player():
         self.left = False
         self.right = False
         self.walkCount = 0
+        self.sprite_sheet = SpriteSheet('assets/stick_man_blue.png')
+        self.frame = 0
 
     def draw(self, win):
-        if self.walkCount + 1 >= 27:
+        if self.walkCount + 1 >= 21:
             self.walkCount = 0
-
         if self.left:
-            win.blit(walkLeft[self.walkCount//3], (self.x, self.y))
+            win.blit(self.sprite_sheet.get_image_hflip(self.width*self.frame*5,
+                     self.height*self.frame*5, self.width*5, self.height*5), (self.x, self.y))
             self.walkCount += 1
+            self.frame = math.ceil(self.walkCount//3)
         elif self.right:
-            win.blit(walkRight[self.walkCount//3], (self.x, self.y))
+            win.blit(self.sprite_sheet.get_image(self.width*self.frame*5,
+                     self.height*self.frame*5, self.width*5, self.height*5), (self.x, self.y))
             self.walkCount += 1
+            self.frame = math.ceil(self.walkCount//3)
         else:
-            win.blit(idle, (self.x, self.y))
+            win.blit(self.sprite_sheet.get_image(0, 0, self.width*5, self.height*5), (self.x, self.y))
 
 
 platform_game = PlatformGame()
