@@ -1,8 +1,7 @@
 import pygame
 import sys
-from animation import idle, walkLeft, walkRight, SpriteSheet
+from animation import SpriteSheet
 from settings import Settings
-import math
 #clock = pygame.time.Clock()
 #win = pygame.display.set_mode((self.screen.screen_width, win_y))
 #pygame.display.set_caption("Untitled Platform Game")
@@ -15,9 +14,26 @@ class PlatformGame():
         self.settings = Settings()
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         self.clock = pygame.time.Clock()
-        self.player = Player(300, 600, 35, 68)
+        self.player = Player(10, 732, 35, 68)
+
+    def main_menu(self):
+        menu = True
+        while menu:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    menu = False
+            self.screen.fill((0, 255, 155))
+            font = pygame.font.Font(None, 120)
+            text = font.render("Press Any Key to Start!", True, (0, 0, 0))
+            text_rect = text.get_rect(center=(self.settings.screen_width/2, self.settings.screen_height/2))
+            self.screen.blit(text, text_rect)
+            pygame.display.update()
 
     def run_game(self):
+        self.main_menu()
         while True:
             self.clock.tick(27)
             self._check_events()
@@ -57,6 +73,13 @@ class PlatformGame():
                 self.player.isJump = False
                 self.player.jumpCount = 10
 
+    def _update_screen(self):
+        global walkCount
+        self.screen.fill(self.settings.bg_color)
+        self.player.draw(self.screen)
+        self.draw_grid()
+        pygame.display.update()
+
     def draw_grid(self):
         grid_range = self.settings.screen_width // self.settings.tile_size
         for line in range(0, grid_range):
@@ -68,13 +91,6 @@ class PlatformGame():
                 self.screen, (255, 255, 255),
                 (line * self.settings.tile_size, 0),
                 (line * self.settings.tile_size, self.settings.screen_width))
-
-    def _update_screen(self):
-        global walkCount
-        self.screen.fill(self.settings.bg_color)
-        self.player.draw(self.screen)
-        self.draw_grid()
-        pygame.display.update()
 
 
 class Player():
@@ -99,12 +115,12 @@ class Player():
             win.blit(self.sprite_sheet.get_image_hflip(self.width*self.frame*5,
                      self.height*self.frame*5, self.width*5, self.height*5), (self.x, self.y))
             self.walkCount += 1
-            self.frame = math.ceil(self.walkCount//3)
+            self.frame = self.walkCount//3
         elif self.right:
             win.blit(self.sprite_sheet.get_image(self.width*self.frame*5,
                      self.height*self.frame*5, self.width*5, self.height*5), (self.x, self.y))
             self.walkCount += 1
-            self.frame = math.ceil(self.walkCount//3)
+            self.frame = self.walkCount//3
         else:
             win.blit(self.sprite_sheet.get_image(0, 0, self.width*5, self.height*5), (self.x, self.y))
 
