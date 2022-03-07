@@ -3,9 +3,9 @@ import sys
 from animation import SpriteSheet
 from settings import Settings
 from game_level import Level
-#clock = pygame.time.Clock()
-#win = pygame.display.set_mode((self.screen.screen_width, win_y))
-#pygame.display.set_caption("Untitled Platform Game")
+# clock = pygame.time.Clock()
+# win = pygame.display.set_mode((self.screen.screen_width, win_y))
+# pygame.display.set_caption("Untitled Platform Game")
 
 
 class PlatformGame():
@@ -16,7 +16,7 @@ class PlatformGame():
         self.level = Level(level_data, self.settings)
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         self.clock = pygame.time.Clock()
-        self.player = Player(10, 732, 35, 68)
+        self.player = Player(self.level, 50, 882)
 
     def main_menu(self):
         menu = True
@@ -46,34 +46,7 @@ class PlatformGame():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] and self.player.x > self.player.vel:
-            self.player.x -= self.player.vel
-            self.player.left = True
-            self.player.right = False
-        elif keys[pygame.K_RIGHT] and self.player.x < self.settings.screen_width - self.player.width - self.player.vel:
-            self.player.x += self.player.vel
-            self.player.left = False
-            self.player.right = True
-        else:
-            self.player.left = False
-            self.player.right = False
-            self.player.walkCount = 0
-
-        if not(self.player.isJump):
-            if keys[pygame.K_SPACE]:
-                self.player.isJump = True
-                self.player.left = False
-                self.player.right = False
-                self.player.walkCount = 0
-        else:
-            if self.player.jumpCount >= -10:
-                self.player.y -= (self.player.jumpCount * abs(self.player.jumpCount)) * 0.3
-                self.player.jumpCount -= 1
-            else:
-                self.player.isJump = False
-                self.player.jumpCount = 10
+        self.player.move()
 
     def _update_screen(self):
         global walkCount
@@ -97,7 +70,7 @@ class PlatformGame():
 
 
 class Player():
-    def __init__(self, x, y, width, height):
+    def __init__(self, level, x, y, width=35, height=68, settings=Settings()):
         self.x = x
         self.y = y
         self.width = width
@@ -110,22 +83,69 @@ class Player():
         self.walkCount = 0
         self.sprite_sheet = SpriteSheet('assets/stick_man_blue.png')
         self.frame = 0
+        self.settings = settings
+        self.level = level
 
     def draw(self, win):
+        image_right = self.sprite_sheet.get_image(
+            self.width*self.frame*5, self.height*self.frame*5, self.width*5, self.height*5)
+        image_left = self.sprite_sheet.get_image_hflip(
+            self.width*self.frame*5, self.height*self.frame*5, self.width*5, self.height*5)
+
         if self.walkCount + 1 >= 21:
             self.walkCount = 0
         if self.left:
-            win.blit(self.sprite_sheet.get_image_hflip(self.width*self.frame*5,
-                     self.height*self.frame*5, self.width*5, self.height*5), (self.x, self.y))
+            win.blit(image_left, (self.x, self.y))
             self.walkCount += 1
             self.frame = self.walkCount//3
         elif self.right:
-            win.blit(self.sprite_sheet.get_image(self.width*self.frame*5,
-                     self.height*self.frame*5, self.width*5, self.height*5), (self.x, self.y))
+            win.blit(image_right, (self.x, self.y))
             self.walkCount += 1
             self.frame = self.walkCount//3
         else:
             win.blit(self.sprite_sheet.get_image(0, 0, self.width*5, self.height*5), (self.x, self.y))
+
+    def move(self):
+        vel_x = 0
+        vel_y = 0
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] and self.x > self.vel:
+            vel_x -= self.vel
+            #self.x -= vel_x
+            self.left = True
+            self.right = False
+        elif keys[pygame.K_RIGHT] and self.x < self.settings.screen_width - self.width - self.vel:
+            vel_x += self.vel
+            #self.x += vel_x
+            self.left = False
+            self.right = True
+        else:
+            self.left = False
+            self.right = False
+            self.walkCount = 0
+
+        if not(self.isJump):
+            if keys[pygame.K_SPACE]:
+                self.isJump = True
+                self.left = False
+                self.right = False
+                self.walkCount = 0
+        else:
+            if self.jumpCount >= -10:
+                print(self.jumpCount)
+                self.y -= (self.jumpCount * abs(self.jumpCount)) * 0.3
+                print(self.y)
+                self.jumpCount -= 1
+            else:
+                self.isJump = False
+                self.jumpCount = 10
+
+        for tile in self.level.tile_list:
+
+            if tile[1].colliderect(self.x + vel_x, self.y, self.width, self.height):
+                vel_x = 0
+
+        self.x += vel_x
 
 
 # Level data size = (tile_size/width,tile_size/height)
@@ -147,10 +167,12 @@ level_data = [
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+    [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+
+
 ]
 
 
