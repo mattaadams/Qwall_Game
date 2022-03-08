@@ -75,9 +75,10 @@ class Player():
         self.y = y
         self.width = width
         self.height = height
-        self.vel = 10
+        self.vel_y = 10
+        self.vel_x = 10
         self.isJump = False
-        self.jumpCount = 10
+        #self.jumpCount = 10
         self.left = False
         self.right = False
         self.walkCount = 0
@@ -106,17 +107,16 @@ class Player():
             win.blit(self.sprite_sheet.get_image(0, 0, self.width*5, self.height*5), (self.x, self.y))
 
     def move(self):
-        vel_x = 0
-        vel_y = 0
+        dx = 0
+        dy = 0
+        # print(self.y)
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] and self.x > self.vel:
-            vel_x -= self.vel
-            #self.x -= vel_x
+        if keys[pygame.K_LEFT] and self.x > self.vel_x:
+            dx -= self.vel_x
             self.left = True
             self.right = False
-        elif keys[pygame.K_RIGHT] and self.x < self.settings.screen_width - self.width - self.vel:
-            vel_x += self.vel
-            #self.x += vel_x
+        elif keys[pygame.K_RIGHT] and self.x < self.settings.screen_width - self.width - self.vel_x:
+            dx += self.vel_x
             self.left = False
             self.right = True
         else:
@@ -124,51 +124,56 @@ class Player():
             self.right = False
             self.walkCount = 0
 
-        if not(self.isJump):
-            if keys[pygame.K_SPACE]:
-                self.isJump = True
-                self.left = False
-                self.right = False
-                self.walkCount = 0
-        else:
-            if self.jumpCount >= -10:
-                print(self.jumpCount)
-                self.y -= (self.jumpCount * abs(self.jumpCount)) * 0.3
-                print(self.y)
-                self.jumpCount -= 1
-            else:
-                self.isJump = False
-                self.jumpCount = 10
+        if keys[pygame.K_SPACE] and self.isJump == False:
+            self.vel_y = -15
+            self.isJump = True
+
+        self.vel_y += 1
+        if self.vel_y > 10:
+            self.vel_y = 10
+        dy += self.vel_y
 
         for tile in self.level.tile_list:
 
-            if tile[1].colliderect(self.x + vel_x, self.y, self.width, self.height):
-                vel_x = 0
+            if tile[1].colliderect(self.x + dx, self.y, self.width, self.height):
+                dx = 0
+            if tile[1].colliderect(self.x, self.y + dy, self.width, self.height):
 
-        self.x += vel_x
+                if self.vel_y < 0:
+                    dy = tile[1].bottom - self.y
+                    self.vel_y = 0
+                elif self.vel_y >= 0:
+                    dy = tile[1].top - (self.y+self.height)
+                    self.vel_y = 0
+                    self.isJump = False
+            if self.y < 0:
+                dy = 0 - self.y
+                self.vel_y = 0
+        self.x += dx
+        self.y += dy
 
 
 # Level data size = (tile_size/width,tile_size/height)
 # each element represents a tile
 level_data = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
+    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
+    [1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 
