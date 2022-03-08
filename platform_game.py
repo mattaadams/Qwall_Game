@@ -9,6 +9,8 @@ from game_level import Level
 
 
 class PlatformGame():
+    """TODO"""
+
     def __init__(self):
         pygame.init()
         pygame.display.set_caption('Platform Game')
@@ -19,6 +21,7 @@ class PlatformGame():
         self.player = Player(self.level, 50, 882)
 
     def main_menu(self):
+        """TODO"""
         menu = True
         while menu:
             for event in pygame.event.get():
@@ -35,6 +38,7 @@ class PlatformGame():
             pygame.display.update()
 
     def run_game(self):
+        """TODO"""
         self.main_menu()
         while True:
             self.clock.tick(27)
@@ -42,6 +46,7 @@ class PlatformGame():
             self._update_screen()
 
     def _check_events(self):
+        """TODO"""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -49,6 +54,7 @@ class PlatformGame():
         self.player.move()
 
     def _update_screen(self):
+        """TODO"""
         global walkCount
         self.screen.fill(self.settings.bg_color)
         self.level.draw(self.screen)
@@ -57,6 +63,7 @@ class PlatformGame():
         pygame.display.update()
 
     def draw_grid(self):
+        """TODO"""
         grid_range = self.settings.screen_width // self.settings.tile_size
         for line in range(0, grid_range):
             pygame.draw.line(
@@ -70,6 +77,8 @@ class PlatformGame():
 
 
 class Player():
+    """TODO"""
+
     def __init__(self, level, x, y, width=35, height=68, settings=Settings()):
         self.x = x
         self.y = y
@@ -88,6 +97,7 @@ class Player():
         self.level = level
 
     def draw(self, win):
+        """TODO"""
         image_right = self.sprite_sheet.get_image(
             self.width*self.frame*5, self.height*self.frame*5, self.width*5, self.height*5)
         image_left = self.sprite_sheet.get_image_hflip(
@@ -107,6 +117,7 @@ class Player():
             win.blit(self.sprite_sheet.get_image(0, 0, self.width*5, self.height*5), (self.x, self.y))
 
     def move(self):
+        """TODO"""
         dx = 0
         dy = 0
         # print(self.y)

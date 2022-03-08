@@ -3,7 +3,10 @@ from settings import Settings
 
 
 class Level():
+    """TODO"""
+
     def __init__(self, data, settings):
+        """TODO"""
         self.tile_list = []
         self.settings = settings
         # load images

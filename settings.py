@@ -1,6 +1,7 @@
 
 
 class Settings:
+    """TODO"""
 
     def __init__(self):
         self.screen_width, self.screen_height = 1000, 1000
