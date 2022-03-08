@@ -1,7 +1,13 @@
 
 
 class Settings:
-    """TODO"""
+    """Description Goes here
+
+    Args:
+
+    Returns:
+
+    """
 
     def __init__(self):
         self.screen_width, self.screen_height = 1000, 1000

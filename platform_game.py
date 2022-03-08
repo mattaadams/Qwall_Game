@@ -9,7 +9,13 @@ from game_level import Level
 
 
 class PlatformGame():
-    """TODO"""
+    """Description Goes here
+
+    Args:
+
+    Returns:
+
+    """
 
     def __init__(self):
         pygame.init()
@@ -21,7 +27,14 @@ class PlatformGame():
         self.player = Player(self.level, 50, 882)
 
     def main_menu(self):
-        """TODO"""
+        """Description Goes here
+
+        Args:
+
+        Returns:
+
+        """
+
         menu = True
         while menu:
             for event in pygame.event.get():
@@ -38,7 +51,14 @@ class PlatformGame():
             pygame.display.update()
 
     def run_game(self):
-        """TODO"""
+        """Description Goes here
+
+        Args:
+
+        Returns:
+
+        """
+
         self.main_menu()
         while True:
             self.clock.tick(27)
@@ -46,7 +66,14 @@ class PlatformGame():
             self._update_screen()
 
     def _check_events(self):
-        """TODO"""
+        """Description Goes here
+
+        Args:
+
+        Returns:
+
+        """
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -54,7 +81,14 @@ class PlatformGame():
         self.player.move()
 
     def _update_screen(self):
-        """TODO"""
+        """Description Goes here
+
+        Args:
+
+        Returns:
+
+        """
+
         global walkCount
         self.screen.fill(self.settings.bg_color)
         self.level.draw(self.screen)
@@ -63,7 +97,14 @@ class PlatformGame():
         pygame.display.update()
 
     def draw_grid(self):
-        """TODO"""
+        """Description Goes here
+
+        Args:
+
+        Returns:
+
+        """
+
         grid_range = self.settings.screen_width // self.settings.tile_size
         for line in range(0, grid_range):
             pygame.draw.line(
@@ -77,7 +118,18 @@ class PlatformGame():
 
 
 class Player():
-    """TODO"""
+    """Description Goes here
+
+    Args:
+        level: (object)
+        x: (int)
+        y: (int)
+        width: (int)
+        height: (int)
+
+    Returns:
+
+    """
 
     def __init__(self, level, x, y, width=35, height=68, settings=Settings()):
         self.x = x
@@ -97,7 +149,13 @@ class Player():
         self.level = level
 
     def draw(self, win):
-        """TODO"""
+        """Description Goes here
+
+        Args:
+
+        Returns:
+
+        """
         image_right = self.sprite_sheet.get_image(
             self.width*self.frame*5, self.height*self.frame*5, self.width*5, self.height*5)
         image_left = self.sprite_sheet.get_image_hflip(
@@ -117,7 +175,13 @@ class Player():
             win.blit(self.sprite_sheet.get_image(0, 0, self.width*5, self.height*5), (self.x, self.y))
 
     def move(self):
-        """TODO"""
+        """Description Goes here
+
+        Args:
+
+        Returns:
+
+        """
         dx = 0
         dy = 0
         # print(self.y)

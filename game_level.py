@@ -3,10 +3,15 @@ from settings import Settings
 
 
 class Level():
-    """TODO"""
+    """Description Goes here
+
+    Args:
+
+    Returns:
+
+    """
 
     def __init__(self, data, settings):
-        """TODO"""
         self.tile_list = []
         self.settings = settings
         # load images
@@ -29,5 +34,12 @@ class Level():
             row_count += 1
 
     def draw(self, screen):
+        """Description Goes here
+
+        Args:
+
+        Returns:
+        """
+
         for tile in self.tile_list:
             pygame.draw.rect(screen, tile[0], tile[1])

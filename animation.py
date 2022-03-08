@@ -2,13 +2,26 @@ import pygame
 
 
 class SpriteSheet:
-    """TODO"""
+    """Description Goes here
+
+    Args:
+
+    Returns:
+
+    """
 
     def __init__(self, filename):
         self.sheet = pygame.image.load(filename).convert_alpha()
 
     def get_image(self, x, y, width, height):
-        """TODO"""
+        """Description Goes here
+
+        Args:
+
+        Returns:
+
+        """
+
         image = pygame.Surface((width, height))
         image.blit(self.sheet, (0, 0), ((x, y, width, height)))
         image.set_colorkey((0, 0, 0))
@@ -16,7 +29,14 @@ class SpriteSheet:
         return image
 
     def get_image_hflip(self, x, y, width, height):
-        """TODO"""
+        """Description Goes here
+
+        Args:
+
+        Returns:
+
+        """
+
         image = pygame.Surface((width, height))
         image.blit(self.sheet, (0, 0), ((x, y, width, height)))
         image.set_colorkey((0, 0, 0))
