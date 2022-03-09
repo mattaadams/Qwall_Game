@@ -11,9 +11,7 @@ from game_level import Level
 class PlatformGame():
     """Description Goes here
 
-    Args:
-
-    Returns:
+    Attributes:
 
     """
 
@@ -27,14 +25,7 @@ class PlatformGame():
         self.player = Player(self.level, 50, 882)
 
     def main_menu(self):
-        """Description Goes here
-
-        Args:
-
-        Returns:
-
-        """
-
+        """Renders a main menu screen"""
         menu = True
         while menu:
             for event in pygame.event.get():
@@ -53,10 +44,6 @@ class PlatformGame():
     def run_game(self):
         """Description Goes here
 
-        Args:
-
-        Returns:
-
         """
 
         self.main_menu()
@@ -66,14 +53,6 @@ class PlatformGame():
             self._update_screen()
 
     def _check_events(self):
-        """Description Goes here
-
-        Args:
-
-        Returns:
-
-        """
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -81,14 +60,6 @@ class PlatformGame():
         self.player.move()
 
     def _update_screen(self):
-        """Description Goes here
-
-        Args:
-
-        Returns:
-
-        """
-
         global walkCount
         self.screen.fill(self.settings.bg_color)
         self.level.draw(self.screen)
@@ -120,14 +91,12 @@ class PlatformGame():
 class Player():
     """Description Goes here
 
-    Args:
-        level: (object)
-        x: (int)
-        y: (int)
-        width: (int)
-        height: (int)
-
-    Returns:
+    Attributes:
+        level: A `Level` object
+        x: An integer
+        y: An integer
+        width: An integer
+        height: An integer 
 
     """
 
@@ -251,10 +220,7 @@ level_data = [
     [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-
-
 ]
-
 
 platform_game = PlatformGame()
 platform_game.run_game()
