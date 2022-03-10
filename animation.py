@@ -1,12 +1,10 @@
 import pygame
 
 
-class SpriteSheet:
+class SpriteSheet():
     """Description Goes here
 
-    Args:
-
-    Returns:
+    Attributes:
 
     """
 

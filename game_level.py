@@ -5,9 +5,7 @@ from settings import Settings
 class Level():
     """Description Goes here
 
-    Args:
-
-    Returns:
+    Attributes:
 
     """
 

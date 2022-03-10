@@ -4,9 +4,9 @@
 
 #### Libraries Used
 - PyGame
-- TensorFlow / PyTorch
+- PyTorch
 
 #### Other Software Used
  
- - Docker (?) 
- - Heroku (?)
+ -  (?) 
+ -  (?)
