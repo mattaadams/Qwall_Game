@@ -1,6 +1,10 @@
 import pygame
 from settings import Settings
 
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+YELLOW = (255, 255, 0)
+
 
 class Level():
     """Description Goes here
@@ -23,11 +27,18 @@ class Level():
                 if tile == 1:
                     x = col_count * self.settings.tile_size
                     y = row_count * self.settings.tile_size
-                    color = (0, 0, 0)
+                    color = BLACK
                     tile = (color, pygame.Rect((x, y), (self.settings.tile_size, self.settings.tile_size)))
                     self.tile_list.append(tile)
                 if tile == 2:
-                    pass
+                    radius = self.settings.tile_size//2
+                    x = col_count * self.settings.tile_size
+                    y = row_count * self.settings.tile_size
+                    center = (x+radius, y+radius)
+                    color = YELLOW
+                    tile = [color, center, radius, self.settings.bg_color, pygame.Rect(
+                        (x, y), (self.settings.tile_size, self.settings.tile_size))]
+                    self.tile_list.append(tile)
                 col_count += 1
             row_count += 1
 
@@ -40,4 +51,8 @@ class Level():
         """
 
         for tile in self.tile_list:
-            pygame.draw.rect(screen, tile[0], tile[1])
+            if tile[0] == BLACK:
+                pygame.draw.rect(screen, tile[0], tile[1])
+            elif tile[0] == YELLOW:
+                pygame.draw.rect(screen, tile[3], tile[4])
+                pygame.draw.circle(screen, tile[0], tile[1], tile[2])
