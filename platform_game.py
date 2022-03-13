@@ -44,11 +44,30 @@ class PlatformGame():
             text_rect = text.get_rect(center=(self.settings.screen_width/2, self.settings.screen_height/2))
             self.screen.blit(text, text_rect)
             pygame.display.update()
+        # TODO -- Add buttons
+
+    # def pause_screen(self):
+    #     """Renders a main menu screen"""
+    #     pause = True
+    #     while pause:
+    #         for event in pygame.event.get():
+    #             if event.type == pygame.QUIT:
+    #                 pygame.quit()
+    #                 sys.exit()
+    #             if event.type == pygame.KEYDOWN:
+    #                 pause = False
+    #         self.screen.fill(self.settings.menu_color)
+    #         font = pygame.font.Font(None, 120)
+    #         text = font.render("PAUSED", True, (0, 0, 0))
+    #         text_rect = text.get_rect(center=(self.settings.screen_width/2, self.settings.screen_height/2))
+    #         self.screen.blit(text, text_rect)
+    #         pygame.display.update()
 
     def run_game(self):
         """Runs the game by calling the functions to generate the environment"""
         self.main_menu()
-        while True:
+        run = True
+        while run:
             self.clock.tick(27)
             self._check_events()
             self._update_screen()
@@ -58,7 +77,7 @@ class PlatformGame():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        self.player.move()
+        self.player.move(self.screen)
 
     def _update_screen(self):
         global walkCount
@@ -108,7 +127,7 @@ class Player():
 
     """
 
-    def __init__(self, level, x, y, width=35, height=68, settings=Settings()):
+    def __init__(self, level, x, y, width=26, height=50, settings=Settings()):
         self.x = x
         self.y = y
         self.width = width
@@ -116,11 +135,13 @@ class Player():
         self.vel_y = 10
         self.vel_x = 10
         self.isJump = False
-        #self.jumpCount = 10
         self.left = False
         self.right = False
         self.walkCount = 0
         self.sprite_sheet = SpriteSheet('assets/stick_man_blue.png')
+        self.scale_factor = self.sprite_sheet.scale_factor
+        self.scaled_width = self.width * self.scale_factor
+        self.scaled_height = self.height * self.scale_factor
         self.frame = 0
         self.settings = settings
         self.level = level
@@ -130,14 +151,16 @@ class Player():
         """Description Goes here
 
         Args:
+            win: Pygame display object
 
         Returns:
 
         """
+
         image_right = self.sprite_sheet.get_image(
-            self.width*self.frame*5, self.height*self.frame*5, self.width*5, self.height*5)
+            self.scaled_width*self.frame, self.scaled_height*self.frame, self.scaled_width, self.scaled_height)
         image_left = self.sprite_sheet.get_image_hflip(
-            self.width*self.frame*5, self.height*self.frame*5, self.width*5, self.height*5)
+            self.scaled_width*self.frame, self.scaled_height*self.frame, self.scaled_width, self.scaled_height)
 
         if self.walkCount + 1 >= 21:
             self.walkCount = 0
@@ -150,9 +173,10 @@ class Player():
             self.walkCount += 1
             self.frame = self.walkCount//3
         else:
-            win.blit(self.sprite_sheet.get_image(0, 0, self.width*5, self.height*5), (self.x, self.y))
+            win.blit(self.sprite_sheet.get_image(0, 0, self.scaled_width,
+                     self.scaled_height), (self.x, self.y))
 
-    def move(self):
+    def move(self, win):
         """Description Goes here
 
         Args:
@@ -162,7 +186,7 @@ class Player():
         """
         dx = 0
         dy = 0
-        # print(self.y)
+
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and self.x > self.vel_x:
             dx -= self.vel_x
@@ -204,10 +228,9 @@ class Player():
                     self.vel_y = 0
             elif tile[0] == YELLOW:
                 if tile[4].colliderect(self.x, self.y, self.width, self.height):
-                    print('+1 point')
                     self.score += 1
                     tile[0] = self.settings.bg_color
-                    #tile[0] = BLACK
+
             else:
                 pass
 
@@ -218,8 +241,8 @@ class Player():
 # Level data size = (tile_size/width,tile_size/height)
 # each element represents a tile
 level_data = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1],
+    [2, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1],
     [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
     [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 2, 0],
@@ -231,10 +254,10 @@ level_data = [
     [1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 2, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
