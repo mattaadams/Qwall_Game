@@ -3,9 +3,14 @@ import sys
 from animation import SpriteSheet
 from settings import Settings
 from game_level import Level
-# clock = pygame.time.Clock()
-# win = pygame.display.set_mode((self.screen.screen_width, win_y))
-# pygame.display.set_caption("Untitled Platform Game")
+import time
+# Issues: Can pause in main menu
+# Roadmap:
+# Add ending after collection of all circles
+# Add leaderboard
+# Randomize coin appearances -- (* Tiles)
+# Hazardous blocks
+# Agent AI
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -27,48 +32,58 @@ class PlatformGame():
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         self.clock = pygame.time.Clock()
         self.player = Player(self.level, 50, 882)
+        self.run = True
+        self.menu = True
+        self.paused = False
+        self.pause_total = 0
 
     def main_menu(self):
         """Renders a main menu screen"""
-        menu = True
-        while menu:
+        while self.menu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
-                    menu = False
+                    self.menu = False
             self.screen.fill(self.settings.menu_color)
             font = pygame.font.Font(None, 120)
-            text = font.render("Press Any Key to Start!", True, (0, 0, 0))
+            text = font.render("Press Any Key to Start!", True, BLACK)
+            text_rect = text.get_rect(center=(self.settings.screen_width/2, self.settings.screen_height/2))
+            self.screen.blit(text, text_rect)
+            self.menu_duration = pygame.time.get_ticks() // 1000
+            pygame.display.update()
+
+    def pause_screen(self):
+        """Renders a main pause screen"""
+        key = pygame.key.get_pressed()
+        if key[pygame.K_ESCAPE] and self.paused == False and self.menu == False:
+            self.paused = True
+            pause_start_time = pygame.time.get_ticks()
+        while self.paused:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    self.paused = False
+                    self.pause_total += (pygame.time.get_ticks() - pause_start_time) // 1000
+            pause_bg = pygame.Surface((self.settings.screen_width, self.settings.screen_height))
+            pause_bg.set_alpha(10)
+            pause_bg.fill((220, 220, 220))
+            self.screen.blit(pause_bg, (0, 0))
+            font = pygame.font.Font(None, 120)
+            text = font.render("PAUSED", True, BLACK)
             text_rect = text.get_rect(center=(self.settings.screen_width/2, self.settings.screen_height/2))
             self.screen.blit(text, text_rect)
             pygame.display.update()
-        # TODO -- Add buttons
-
-    # def pause_screen(self):
-    #     """Renders a main menu screen"""
-    #     pause = True
-    #     while pause:
-    #         for event in pygame.event.get():
-    #             if event.type == pygame.QUIT:
-    #                 pygame.quit()
-    #                 sys.exit()
-    #             if event.type == pygame.KEYDOWN:
-    #                 pause = False
-    #         self.screen.fill(self.settings.menu_color)
-    #         font = pygame.font.Font(None, 120)
-    #         text = font.render("PAUSED", True, (0, 0, 0))
-    #         text_rect = text.get_rect(center=(self.settings.screen_width/2, self.settings.screen_height/2))
-    #         self.screen.blit(text, text_rect)
-    #         pygame.display.update()
 
     def run_game(self):
         """Runs the game by calling the functions to generate the environment"""
-        self.main_menu()
-        run = True
-        while run:
+        while self.run:
             self.clock.tick(27)
+            self.main_menu()
+            self.pause_screen()
             self._check_events()
             self._update_screen()
 
@@ -80,9 +95,8 @@ class PlatformGame():
         self.player.move(self.screen)
 
     def _update_screen(self):
-        global walkCount
-        time_penalty = (pygame.time.get_ticks() // 1000)
-        base_score = 100 - time_penalty
+        game_time = (pygame.time.get_ticks() // 1000)
+        base_score = 100 - game_time + self.menu_duration + self.pause_total
         score = self.player.score + base_score
         self.screen.fill(self.settings.bg_color)
         self.level.draw(self.screen)
@@ -123,7 +137,7 @@ class Player():
         x: An integer
         y: An integer
         width: An integer
-        height: An integer 
+        height: An integer
 
     """
 
