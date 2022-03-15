@@ -1,6 +1,7 @@
 import torch
 import random
 import numpy as np
+from platform_game import PlatformGame
 
 
 class Agent():
@@ -9,12 +10,23 @@ class Agent():
         self.n_games = 0
         self.epsilon = 0
 
-    def get_state(self):
+    def get_state(self, game):
         pass
 
-    def get_action(self):
+    def remember(self, state, action, reward, next_state, done):
+        pass
+
+    def train_long_memory(self):
+        pass
+
+    def train_short_memory(self, state, action, reward, next_state, done):
+        pass
+
+    def get_action(self, state):
         pass
 
 
 def train():
-    pass
+    agent = Agent()
+    game = PlatformGame()
+    total_score = 0
