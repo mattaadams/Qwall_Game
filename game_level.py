@@ -17,6 +17,8 @@ class Level():
     def __init__(self, data, settings):
         self.tile_list = []
         self.settings = settings
+        self.data = data
+        self.coins = 0
         # load images
         # dirt_img = pygame.image.load('img/dirt.png')
         # grass_img = pygame.image.load('img/grass.png')
@@ -40,6 +42,7 @@ class Level():
                     tile = [color, center, radius, self.settings.bg_color, pygame.Rect(
                         (x, y), (self.settings.tile_size, self.settings.tile_size))]
                     self.tile_list.append(tile)
+                    self.coins += 1
                 col_count += 1
             row_count += 1
 
@@ -57,3 +60,6 @@ class Level():
             elif tile[0] == YELLOW:
                 pygame.draw.rect(screen, tile[3], tile[4])
                 pygame.draw.circle(screen, tile[0], tile[1], tile[2])
+
+    def get_max_coins(self):
+        return self.coins

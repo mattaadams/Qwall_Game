@@ -86,12 +86,22 @@ class PlatformGame():
             self.screen.blit(text, text_rect)
             pygame.display.update()
 
+    def game_over(self):
+        game_over = False
+        if self.player.coins == self.level.get_max_coins():
+            font = pygame.font.Font(None, 120)
+            text = font.render("WINNER", True, BLACK)
+            text_rect = text.get_rect(center=(self.settings.screen_width/2, self.settings.screen_height/2))
+            self.screen.blit(text, text_rect)
+            pygame.display.update()
+
     def run_game(self):
         """Runs the game by calling the functions to generate the environment"""
         while self.run:
             self.clock.tick(27)
             self.main_menu()
             self.pause_screen()
+            self.game_over()
             self._check_events()
             self._update_screen()
 
@@ -105,7 +115,7 @@ class PlatformGame():
     def _update_screen(self):
         game_time = (pygame.time.get_ticks() // 1000)
         base_score = 100 - game_time + self.menu_duration + self.pause_total
-        score = self.player.score + base_score
+        score = self.player.coins + base_score
         self.screen.fill(self.settings.bg_color)
         self.level.draw(self.screen)
         self.draw_grid()
@@ -124,7 +134,6 @@ class PlatformGame():
         Returns:
 
         """
-
         grid_range = self.settings.screen_width // self.settings.tile_size
         for line in range(0, grid_range):
             pygame.draw.line(
@@ -167,7 +176,7 @@ class Player():
         self.frame = 0
         self.settings = settings
         self.level = level
-        self.score = 0
+        self.coins = 0
 
     def draw(self, win):
         """Description Goes here
@@ -250,7 +259,7 @@ class Player():
                     self.vel_y = 0
             elif tile[0] == YELLOW:
                 if tile[4].colliderect(self.x, self.y, self.width, self.height):
-                    self.score += 1
+                    self.coins += 1
                     tile[0] = self.settings.bg_color
 
             else:
@@ -263,7 +272,7 @@ class Player():
 # Level data size = (tile_size/width,tile_size/height)
 # each element represents a tile
 level_data = [
-    [0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1],
     [2, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1],
     [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],

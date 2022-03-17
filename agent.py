@@ -3,6 +3,11 @@ import random
 import numpy as np
 from model import Linear_QNet
 from platform_game import PlatformGame
+from collections import deque
+
+MAX_MEMORY = 100_000
+BATCH_SIZE = 1000
+LR = 0.001
 
 
 class Agent():
@@ -11,14 +16,15 @@ class Agent():
         self.n_games = 0
         self.epsilon = 0
         self.gamma = 0.8
-        self.memory = 0
+        self.memory = deque(maxlen=MAX_MEMORY)
         self.model = Linear_QNet(11, 256, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
         player = game.player
         # Player coordinates, and what the player is around (can player move left,right,up,down)
-        # State of the other coins
+        # State of the other 'coins'
+        # level (static except for 'coins')
         dir_left = 0
         dir_right = 0
         dir_up = 0
