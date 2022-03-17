@@ -5,13 +5,14 @@ from settings import Settings
 from game_level import Level
 import time
 # Roadmap:
-# Add ending after collection of all circles
+# Add ending after collection of all circles (Ending condition created, screen needed next and need to record/pause the final score)
 # Menu buttons (ai vs non-ai mode)
 # Add leaderboard
-# Hazardous blocks
-# nn model
+# nn model (Torch Linear QNet for now)
 # Agent
 # model viz
+
+# Hazardous blocks
 
 # Other Notes:
 # Do not RNG tiles -- **RNG bad if scored based on time**
@@ -40,12 +41,13 @@ class PlatformGame():
         self.run = True
         self.menu = True
         self.paused = False
+        self.is_game_over = False
         self.pause_total = 0
+        self.game_score = 1
 
     def main_menu(self):
         """Renders a main menu screen"""
         key = pygame.key.get_pressed()
-
         while self.menu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -87,12 +89,33 @@ class PlatformGame():
             pygame.display.update()
 
     def game_over(self):
-        game_over = False
+
+        font = pygame.font.Font(None, 80)
+        key = pygame.key.get_pressed()
         if self.player.coins == self.level.get_max_coins():
-            font = pygame.font.Font(None, 120)
-            text = font.render("WINNER", True, BLACK)
+            self.is_game_over = True
+            text = font.render("WINNER! Press 'R' to Restart", True, BLACK)
+            subtext = font.render(f"Score: {self.game_score}", True, BLACK)
+        elif self.game_score == 0:
+            self.is_game_over = True
+            text = font.render("GAME OVER. Press 'R' to Restart", True, BLACK)
+            subtext = font.render(f"Score: {self.game_score}", True, BLACK)
+        while self.is_game_over:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        self.__init__()  # Reinitialize, is this unsafe?
+
             text_rect = text.get_rect(center=(self.settings.screen_width/2, self.settings.screen_height/2))
+            subtext_rect = subtext.get_rect(center=(self.settings.screen_width/2, 120+(self.settings.screen_height/2)))
+
+            self.screen.fill(self.settings.bg_color)
             self.screen.blit(text, text_rect)
+            self.screen.blit(subtext, subtext_rect)
+
             pygame.display.update()
 
     def run_game(self):
@@ -111,16 +134,16 @@ class PlatformGame():
                 pygame.quit()
                 sys.exit()
         self.player.move(self.screen)
+        game_time = (pygame.time.get_ticks() // 1000)
+        base_score = 5 - game_time + self.menu_duration + self.pause_total
+        self.game_score = self.player.coins*3 + base_score
 
     def _update_screen(self):
-        game_time = (pygame.time.get_ticks() // 1000)
-        base_score = 100 - game_time + self.menu_duration + self.pause_total
-        score = self.player.coins + base_score
         self.screen.fill(self.settings.bg_color)
         self.level.draw(self.screen)
         self.draw_grid()
         font = pygame.font.Font(None, 48)
-        text = font.render(f'Score: {score}', True, (0, 0, 0))
+        text = font.render(f'Score: {self.game_score}', True, (0, 0, 0))
         text_rect = text.get_rect(center=(90, 25))
         self.screen.blit(text, text_rect)
         self.player.draw(self.screen)
@@ -217,13 +240,13 @@ class Player():
         """
         dx = 0
         dy = 0
+        key = pygame.key.get_pressed()
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] and self.x > self.vel_x:
+        if key[pygame.K_LEFT] and self.x > self.vel_x:
             dx -= self.vel_x
             self.left = True
             self.right = False
-        elif keys[pygame.K_RIGHT] and self.x < self.settings.screen_width - self.width - self.vel_x:
+        elif key[pygame.K_RIGHT] and self.x < self.settings.screen_width - self.width - self.vel_x:
             dx += self.vel_x
             self.left = False
             self.right = True
@@ -232,7 +255,7 @@ class Player():
             self.right = False
             self.walkCount = 0
 
-        if keys[pygame.K_SPACE] and self.isJump == False and self.vel_y == 0:
+        if key[pygame.K_SPACE] and self.isJump == False and self.vel_y == 0:
             self.vel_y = -15
             self.isJump = True
 
