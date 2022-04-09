@@ -8,7 +8,7 @@ class SpriteSheet():
 
     """
 
-    def __init__(self, filename, scale_factor=6.8*2):
+    def __init__(self, filename, scale_factor=6.8*1.25):
         self.sheet = pygame.image.load(filename).convert_alpha()
         self.scale_factor = scale_factor
         self.sheetsize = self.sheet.get_rect()

@@ -37,7 +37,7 @@ class PlatformGame(Settings):
         self.level = Level(level_data)
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.clock = pygame.time.Clock()
-        self.player = Player(self.level, 25, 441)
+        self.player = Player(self.level, 40, 740)
         self.run = True
         self.menu = True
         self.paused = False
@@ -57,7 +57,7 @@ class PlatformGame(Settings):
                     if event.key == pygame.K_e:
                         self.menu = False
             self.screen.fill(self.menu_color)
-            font = pygame.font.Font(None, 60)
+            font = pygame.font.Font(None, 72)
             text = font.render("Press 'E' to Start!", True, BLACK)
             text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
             self.screen.blit(text, text_rect)
@@ -90,7 +90,7 @@ class PlatformGame(Settings):
 
     def game_over(self):
 
-        font = pygame.font.Font(None, 40)
+        font = pygame.font.Font(None, 48)
         key = pygame.key.get_pressed()
         if self.player.coins == self.level.get_max_coins():
             self.is_game_over = True
@@ -142,12 +142,13 @@ class PlatformGame(Settings):
         self.screen.fill(self.bg_color)
         self.level.draw(self.screen)
         self.draw_grid()
-        font = pygame.font.Font(None, 24)
+        font = pygame.font.Font(None, 36)
         text = font.render(f'Score: {self.game_score}', True, (0, 0, 0))
-        text_rect = text.get_rect(center=(40, 12))
+        text_rect = text.get_rect(center=(60, 16))
         self.screen.blit(text, text_rect)
         self.player.draw(self.screen)
         pygame.display.update()
+        
 
     def draw_grid(self):
         """Description Goes here
@@ -181,14 +182,14 @@ class Player(Settings):
 
     """
 
-    def __init__(self, level, x, y, width=13, height=25):
+    def __init__(self, level, x, y, width=21, height=40):
         super().__init__()
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.vel_y = 0
-        self.vel_x = 5
+        self.vel_x = 8
         self.isJump = False
         self.left = False
         self.right = False
@@ -256,12 +257,12 @@ class Player(Settings):
             self.walkCount = 0
 
         if key[pygame.K_SPACE] and self.isJump == False and self.vel_y == 0:
-            self.vel_y = -12
+            self.vel_y = -13.5
             self.isJump = True
 
         self.vel_y += 1
-        if self.vel_y > 5:
-            self.vel_y = 5
+        if self.vel_y > 8:
+            self.vel_y = 8
         dy += self.vel_y
 
         for tile in self.level.tile_list:
@@ -305,8 +306,8 @@ level_data = [
     [2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 2, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
     [1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1],
+    [1, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+    [1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
