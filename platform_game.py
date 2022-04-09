@@ -5,18 +5,16 @@ from settings import Settings
 from game_level import Level
 import time
 # Roadmap:
-# Add ending after collection of all circles (Ending condition created, screen needed next and need to record/pause the final score)
 # Menu buttons (ai vs non-ai mode)
 # Add leaderboard
 # nn model (Torch Linear QNet for now)
 # Agent'
 # model viz
-#  pygame.RESIZABLE window
-# Hazardous blocks
 
+# Hazardous blocks
 # Other Notes:
 # Do not RNG tiles -- **RNG bad if scored based on time**
-
+#  pygame.RESIZABLE window, would need to change all renders, keep aspect ratio
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -24,9 +22,11 @@ YELLOW = (255, 255, 0)
 
 
 class PlatformGame(Settings):
-    """Description Goes here
+    """PlatformGame class is used to update the screen 
+    and check events while the game is running.
 
     Attributes:
+    
 
     """
 
@@ -45,8 +45,8 @@ class PlatformGame(Settings):
         self.pause_total = 0
         self.game_score = 1
 
-    def main_menu(self):
-        """Renders a main menu screen"""
+    def _main_menu(self):
+        """Draws a main menu screen"""
         key = pygame.key.get_pressed()
         while self.menu:
             for event in pygame.event.get():
@@ -57,15 +57,15 @@ class PlatformGame(Settings):
                     if event.key == pygame.K_e:
                         self.menu = False
             self.screen.fill(self.menu_color)
-            font = pygame.font.Font(None, 72)
+            font = pygame.font.Font(None, 64)
             text = font.render("Press 'E' to Start!", True, BLACK)
             text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
             self.screen.blit(text, text_rect)
             self.menu_duration = pygame.time.get_ticks() // 1000
             pygame.display.update()
 
-    def pause_screen(self):
-        """Renders a main pause screen"""
+    def _pause_screen(self):
+        """Draws a pause screen"""
         key = pygame.key.get_pressed()
         if key[pygame.K_ESCAPE] and self.paused == False and self.menu == False:
             self.paused = True
@@ -82,15 +82,15 @@ class PlatformGame(Settings):
             pause_bg.set_alpha(10)
             pause_bg.fill((220, 220, 220))
             self.screen.blit(pause_bg, (0, 0))
-            font = pygame.font.Font(None, 60)
+            font = pygame.font.Font(None, 120)
             text = font.render("PAUSED", True, BLACK)
             text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
             self.screen.blit(text, text_rect)
             pygame.display.update()
 
-    def game_over(self):
-
-        font = pygame.font.Font(None, 48)
+    def _game_over(self):
+        """Draws the ending screen"""
+        font = pygame.font.Font(None, 64)
         key = pygame.key.get_pressed()
         if self.player.coins == self.level.get_max_coins():
             self.is_game_over = True
@@ -122,9 +122,9 @@ class PlatformGame(Settings):
         """Runs the game by calling the functions to generate the environment"""
         while self.run:
             self.clock.tick(27)
-            self.main_menu()
-            self.pause_screen()
-            self.game_over()
+            self._main_menu()
+            self._pause_screen()
+            self._game_over()
             self._check_events()
             self._update_screen()
 
@@ -133,7 +133,7 @@ class PlatformGame(Settings):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        self.player.move(self.screen)
+        self.player.move()
         game_time = (pygame.time.get_ticks() // 1000)
         base_score = 30 - game_time + self.menu_duration + self.pause_total
         self.game_score = self.player.coins*3 + base_score
@@ -141,7 +141,7 @@ class PlatformGame(Settings):
     def _update_screen(self):
         self.screen.fill(self.bg_color)
         self.level.draw(self.screen)
-        self.draw_grid()
+        self._draw_grid()
         font = pygame.font.Font(None, 36)
         text = font.render(f'Score: {self.game_score}', True, (0, 0, 0))
         text_rect = text.get_rect(center=(60, 16))
@@ -150,14 +150,7 @@ class PlatformGame(Settings):
         pygame.display.update()
         
 
-    def draw_grid(self):
-        """Description Goes here
-
-        Args:
-
-        Returns:
-
-        """
+    def _draw_grid(self):
         grid_range = self.screen_width // self.tile_size
         for line in range(0, grid_range):
             pygame.draw.line(
@@ -171,7 +164,7 @@ class PlatformGame(Settings):
 
 
 class Player(Settings):
-    """Description Goes here
+    """The Player Class represents a player inside the game.
 
     Attributes:
         level: A `Level` object
@@ -203,13 +196,11 @@ class Player(Settings):
         self.coins = 0
 
     def draw(self, win):
-        """Description Goes here
+        """Creates a drawing of the player object on the game screen
 
         Args:
             win: Pygame display object
-
-        Returns:
-
+        
         """
 
         image_right = self.sprite_sheet.get_image(
@@ -231,14 +222,8 @@ class Player(Settings):
             win.blit(self.sprite_sheet.get_image(0, 0, self.scaled_width,
                      self.scaled_height), (self.x, self.y))
 
-    def move(self, win):
-        """Description Goes here
-
-        Args:
-
-        Returns:
-
-        """
+    def move(self):
+        """Moves the position of the player object."""
         dx = 0
         dy = 0
         key = pygame.key.get_pressed()

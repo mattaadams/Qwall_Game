@@ -18,9 +18,13 @@ class SpriteSheet():
         self.img_height = self.sheetsize.h / self.sheet_rows
 
     def get_image(self, x, y, width, height):
-        """Description Goes here
+        """Gets an image from the selected area of a file.
 
         Args:
+            x: 
+            y:
+            width:
+            height:
 
         Returns:
 
@@ -32,8 +36,8 @@ class SpriteSheet():
         image = pygame.transform.scale(image, (width/self.scale_factor, height/self.scale_factor))
         return image
 
-    def get_image_hflip(self, x, y, width, height, scale_factor=6.8):
-        """Description Goes here
+    def get_image_hflip(self, x, y, width, height):
+        """Gets a mirrored image from the selected area of a file.
 
         Args:
 

@@ -8,9 +8,11 @@ YELLOW = (255, 255, 0)
 
 
 class Level(Settings):
-    """Description Goes here
+    """The Level class is used to draw and add the level object
+    data onto the screen.
 
-    Attributes:
+    Attributes: 
+        data: a list of numbers representing different tiles.
 
     """
 
@@ -47,11 +49,11 @@ class Level(Settings):
             row_count += 1
 
     def draw(self, screen):
-        """Description Goes here
+        """Draws the tiles onto the game screen
 
         Args:
+            screen: Pygame display object
 
-        Returns:
         """
 
         for tile in self.tile_list:
