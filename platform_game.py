@@ -9,7 +9,7 @@ import time
 # Menu buttons (ai vs non-ai mode)
 # Add leaderboard
 # nn model (Torch Linear QNet for now)
-# Agent
+# Agent'
 # model viz
 
 # Hazardous blocks
@@ -34,10 +34,10 @@ class PlatformGame():
         pygame.init()
         pygame.display.set_caption('Platform Game')
         self.settings = Settings()
-        self.level = Level(level_data, self.settings)
+        self.level = Level(level_data)
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         self.clock = pygame.time.Clock()
-        self.player = Player(self.level, 50, 882)
+        self.player = Player(self.level, 25, 441)
         self.run = True
         self.menu = True
         self.paused = False
@@ -57,7 +57,7 @@ class PlatformGame():
                     if event.key == pygame.K_e:
                         self.menu = False
             self.screen.fill(self.settings.menu_color)
-            font = pygame.font.Font(None, 120)
+            font = pygame.font.Font(None, 60)
             text = font.render("Press 'E' to Start!", True, BLACK)
             text_rect = text.get_rect(center=(self.settings.screen_width/2, self.settings.screen_height/2))
             self.screen.blit(text, text_rect)
@@ -82,7 +82,7 @@ class PlatformGame():
             pause_bg.set_alpha(10)
             pause_bg.fill((220, 220, 220))
             self.screen.blit(pause_bg, (0, 0))
-            font = pygame.font.Font(None, 120)
+            font = pygame.font.Font(None, 60)
             text = font.render("PAUSED", True, BLACK)
             text_rect = text.get_rect(center=(self.settings.screen_width/2, self.settings.screen_height/2))
             self.screen.blit(text, text_rect)
@@ -90,7 +90,7 @@ class PlatformGame():
 
     def game_over(self):
 
-        font = pygame.font.Font(None, 80)
+        font = pygame.font.Font(None, 40)
         key = pygame.key.get_pressed()
         if self.player.coins == self.level.get_max_coins():
             self.is_game_over = True
@@ -135,16 +135,16 @@ class PlatformGame():
                 sys.exit()
         self.player.move(self.screen)
         game_time = (pygame.time.get_ticks() // 1000)
-        base_score = 5 - game_time + self.menu_duration + self.pause_total
+        base_score = 30 - game_time + self.menu_duration + self.pause_total
         self.game_score = self.player.coins*3 + base_score
 
     def _update_screen(self):
         self.screen.fill(self.settings.bg_color)
         self.level.draw(self.screen)
         self.draw_grid()
-        font = pygame.font.Font(None, 48)
+        font = pygame.font.Font(None, 24)
         text = font.render(f'Score: {self.game_score}', True, (0, 0, 0))
-        text_rect = text.get_rect(center=(90, 25))
+        text_rect = text.get_rect(center=(40, 12))
         self.screen.blit(text, text_rect)
         self.player.draw(self.screen)
         pygame.display.update()
@@ -181,13 +181,13 @@ class Player():
 
     """
 
-    def __init__(self, level, x, y, width=26, height=50, settings=Settings()):
+    def __init__(self, level, x, y, width=13, height=25, settings=Settings()):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.vel_y = 10
-        self.vel_x = 10
+        self.vel_y = 0
+        self.vel_x = 5
         self.isJump = False
         self.left = False
         self.right = False
@@ -256,12 +256,12 @@ class Player():
             self.walkCount = 0
 
         if key[pygame.K_SPACE] and self.isJump == False and self.vel_y == 0:
-            self.vel_y = -15
+            self.vel_y = -12
             self.isJump = True
 
         self.vel_y += 1
-        if self.vel_y > 10:
-            self.vel_y = 10
+        if self.vel_y > 5:
+            self.vel_y = 5
         dy += self.vel_y
 
         for tile in self.level.tile_list:
@@ -296,7 +296,7 @@ class Player():
 # each element represents a tile
 level_data = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1],
-    [2, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1],
+    [2, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
     [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
     [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 2, 0],

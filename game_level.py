@@ -7,16 +7,16 @@ WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 
 
-class Level():
+class Level(Settings):
     """Description Goes here
 
     Attributes:
 
     """
 
-    def __init__(self, data, settings):
+    def __init__(self, data):
+        Settings.__init__(self)
         self.tile_list = []
-        self.settings = settings
         self.data = data
         self.coins = 0
         # load images
@@ -28,19 +28,19 @@ class Level():
             col_count = 0
             for tile in row:
                 if tile == 1:
-                    x = col_count * self.settings.tile_size
-                    y = row_count * self.settings.tile_size
+                    x = col_count * self.tile_size
+                    y = row_count * self.tile_size
                     color = BLACK
-                    tile = (color, pygame.Rect((x, y), (self.settings.tile_size, self.settings.tile_size)))
+                    tile = (color, pygame.Rect((x, y), (self.tile_size, self.tile_size)))
                     self.tile_list.append(tile)
                 if tile == 2:
-                    radius = self.settings.tile_size//2
-                    x = col_count * self.settings.tile_size
-                    y = row_count * self.settings.tile_size
+                    radius = self.tile_size//2
+                    x = col_count * self.tile_size
+                    y = row_count * self.tile_size
                     center = (x+radius, y+radius)
                     color = YELLOW
-                    tile = [color, center, radius, self.settings.bg_color, pygame.Rect(
-                        (x, y), (self.settings.tile_size, self.settings.tile_size))]
+                    tile = [color, center, radius, self.bg_color, pygame.Rect(
+                        (x, y), (self.tile_size, self.tile_size))]
                     self.tile_list.append(tile)
                     self.coins += 1
                 col_count += 1
