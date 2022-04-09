@@ -4,6 +4,7 @@ from animation import SpriteSheet
 from settings import Settings
 from game_level import Level
 from enum import Enum
+import numpy as np
 
 class Direction(Enum):
     RIGHT = 1
@@ -17,10 +18,11 @@ YELLOW = (255, 255, 0)
 
 
 class PlatformGame(Settings):
-    """Description Goes here
+    """PlatformGame class is used to update the screen 
+    and check events while the game is running.
 
     Attributes:
-
+    
     """
 
     def __init__(self):
@@ -126,7 +128,7 @@ class PlatformGame(Settings):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        self.player.move(self.screen)
+        self.player.move()
         game_time = (pygame.time.get_ticks() // 1000)
         base_score = 30 - game_time + self.menu_duration + self.pause_total
         self.game_score = self.player.coins*3 + base_score
@@ -134,7 +136,7 @@ class PlatformGame(Settings):
     def _update_screen(self):
         self.screen.fill(self.bg_color)
         self.level.draw(self.screen)
-        self.draw_grid()
+        self._draw_grid()
         font = pygame.font.Font(None, 36)
         text = font.render(f'Score: {self.game_score}', True, (0, 0, 0))
         text_rect = text.get_rect(center=(60, 16))
@@ -143,14 +145,7 @@ class PlatformGame(Settings):
         pygame.display.update()
         
 
-    def draw_grid(self):
-        """Description Goes here
-
-        Args:
-
-        Returns:
-
-        """
+    def _draw_grid(self):
         grid_range = self.screen_width // self.tile_size
         for line in range(0, grid_range):
             pygame.draw.line(
@@ -164,7 +159,7 @@ class PlatformGame(Settings):
 
 
 class Player(Settings):
-    """Description Goes here
+    """The Player Class represents a player inside the game.
 
     Attributes:
         level: A `Level` object
@@ -196,13 +191,11 @@ class Player(Settings):
         self.coins = 0
 
     def draw(self, win):
-        """Description Goes here
+        """Creates a drawing of the player object on the game screen
 
         Args:
             win: Pygame display object
-
-        Returns:
-
+        
         """
 
         image_right = self.sprite_sheet.get_image(
@@ -225,31 +218,24 @@ class Player(Settings):
                      self.scaled_height), (self.x, self.y))
 
     def move(self, action):
-        """Description Goes here
-
-        Args:
-
-        Returns:
-
-        """
+        """Moves the position of the player object."""
         dx = 0
         dy = 0
-        key = pygame.key.get_pressed()
-
-        if key[pygame.K_LEFT] and self.x > self.vel_x:
+        # [Left, Right, Stop, Jump]
+        if np.array_equal(action, [1, 0, 0, 0]) and self.x > self.vel_x:
             dx -= self.vel_x
             self.left = True
             self.right = False
-        elif key[pygame.K_RIGHT] and self.x < self.screen_width - self.width - self.vel_x:
+        if np.array_equal(action, [0, 1, 0, 0]) and self.x < self.screen_width - self.width - self.vel_x:
             dx += self.vel_x
             self.left = False
             self.right = True
-        else:
+        elif np.array_equal(action, [0, 0, 1, 0]):
             self.left = False
             self.right = False
             self.walkCount = 0
 
-        if key[pygame.K_SPACE] and self.isJump == False and self.vel_y == 0:
+        if np.array_equal(action, [0, 0, 0, 1]) and self.isJump == False and self.vel_y == 0:
             self.vel_y = -13.5
             self.isJump = True
 

@@ -27,7 +27,6 @@ class PlatformGame(Settings):
 
     Attributes:
     
-
     """
 
     def __init__(self):
