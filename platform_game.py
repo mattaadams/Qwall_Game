@@ -11,7 +11,7 @@ import time
 # nn model (Torch Linear QNet for now)
 # Agent'
 # model viz
-
+#  pygame.RESIZABLE window
 # Hazardous blocks
 
 # Other Notes:
@@ -23,7 +23,7 @@ WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 
 
-class PlatformGame():
+class PlatformGame(Settings):
     """Description Goes here
 
     Attributes:
@@ -31,11 +31,11 @@ class PlatformGame():
     """
 
     def __init__(self):
+        super().__init__()
         pygame.init()
         pygame.display.set_caption('Platform Game')
-        self.settings = Settings()
         self.level = Level(level_data)
-        self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.clock = pygame.time.Clock()
         self.player = Player(self.level, 25, 441)
         self.run = True
@@ -56,10 +56,10 @@ class PlatformGame():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_e:
                         self.menu = False
-            self.screen.fill(self.settings.menu_color)
+            self.screen.fill(self.menu_color)
             font = pygame.font.Font(None, 60)
             text = font.render("Press 'E' to Start!", True, BLACK)
-            text_rect = text.get_rect(center=(self.settings.screen_width/2, self.settings.screen_height/2))
+            text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
             self.screen.blit(text, text_rect)
             self.menu_duration = pygame.time.get_ticks() // 1000
             pygame.display.update()
@@ -78,13 +78,13 @@ class PlatformGame():
                 if event.type == pygame.KEYDOWN:
                     self.paused = False
                     self.pause_total += (pygame.time.get_ticks() - pause_start_time) // 1000
-            pause_bg = pygame.Surface((self.settings.screen_width, self.settings.screen_height))
+            pause_bg = pygame.Surface((self.screen_width, self.screen_height))
             pause_bg.set_alpha(10)
             pause_bg.fill((220, 220, 220))
             self.screen.blit(pause_bg, (0, 0))
             font = pygame.font.Font(None, 60)
             text = font.render("PAUSED", True, BLACK)
-            text_rect = text.get_rect(center=(self.settings.screen_width/2, self.settings.screen_height/2))
+            text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
             self.screen.blit(text, text_rect)
             pygame.display.update()
 
@@ -109,10 +109,10 @@ class PlatformGame():
                     if event.key == pygame.K_r:
                         self.__init__()  # Reinitialize, is this unsafe?
 
-            text_rect = text.get_rect(center=(self.settings.screen_width/2, self.settings.screen_height/2))
-            subtext_rect = subtext.get_rect(center=(self.settings.screen_width/2, 120+(self.settings.screen_height/2)))
+            text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
+            subtext_rect = subtext.get_rect(center=(self.screen_width/2, 120+(self.screen_height/2)))
 
-            self.screen.fill(self.settings.bg_color)
+            self.screen.fill(self.bg_color)
             self.screen.blit(text, text_rect)
             self.screen.blit(subtext, subtext_rect)
 
@@ -139,7 +139,7 @@ class PlatformGame():
         self.game_score = self.player.coins*3 + base_score
 
     def _update_screen(self):
-        self.screen.fill(self.settings.bg_color)
+        self.screen.fill(self.bg_color)
         self.level.draw(self.screen)
         self.draw_grid()
         font = pygame.font.Font(None, 24)
@@ -157,19 +157,19 @@ class PlatformGame():
         Returns:
 
         """
-        grid_range = self.settings.screen_width // self.settings.tile_size
+        grid_range = self.screen_width // self.tile_size
         for line in range(0, grid_range):
             pygame.draw.line(
                 self.screen, WHITE,
-                (0, line * self.settings.tile_size),
-                (self.settings.screen_width, line * self.settings.tile_size))
+                (0, line * self.tile_size),
+                (self.screen_width, line * self.tile_size))
             pygame.draw.line(
                 self.screen, WHITE,
-                (line * self.settings.tile_size, 0),
-                (line * self.settings.tile_size, self.settings.screen_width))
+                (line * self.tile_size, 0),
+                (line * self.tile_size, self.screen_width))
 
 
-class Player():
+class Player(Settings):
     """Description Goes here
 
     Attributes:
@@ -181,7 +181,8 @@ class Player():
 
     """
 
-    def __init__(self, level, x, y, width=13, height=25, settings=Settings()):
+    def __init__(self, level, x, y, width=13, height=25):
+        super().__init__()
         self.x = x
         self.y = y
         self.width = width
@@ -197,7 +198,6 @@ class Player():
         self.scaled_width = self.width * self.scale_factor
         self.scaled_height = self.height * self.scale_factor
         self.frame = 0
-        self.settings = settings
         self.level = level
         self.coins = 0
 
@@ -246,7 +246,7 @@ class Player():
             dx -= self.vel_x
             self.left = True
             self.right = False
-        elif key[pygame.K_RIGHT] and self.x < self.settings.screen_width - self.width - self.vel_x:
+        elif key[pygame.K_RIGHT] and self.x < self.screen_width - self.width - self.vel_x:
             dx += self.vel_x
             self.left = False
             self.right = True
@@ -283,7 +283,7 @@ class Player():
             elif tile[0] == YELLOW:
                 if tile[4].colliderect(self.x, self.y, self.width, self.height):
                     self.coins += 1
-                    tile[0] = self.settings.bg_color
+                    tile[0] = self.bg_color
 
             else:
                 pass

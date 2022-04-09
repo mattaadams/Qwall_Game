@@ -15,7 +15,7 @@ class Level(Settings):
     """
 
     def __init__(self, data):
-        Settings.__init__(self)
+        super().__init__()
         self.tile_list = []
         self.data = data
         self.coins = 0
