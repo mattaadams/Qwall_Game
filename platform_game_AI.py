@@ -3,19 +3,14 @@ import sys
 from animation import SpriteSheet
 from settings import Settings
 from game_level import Level
-from enum import Enum
 import numpy as np
 
-class Direction(Enum):
-    RIGHT = 1
-    LEFT = 2
-    UP = 3
-    DOWN = 4
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 
+action = [0, 0, 0, 1]
 
 class PlatformGame(Settings):
     """PlatformGame class is used to update the screen 
@@ -120,15 +115,16 @@ class PlatformGame(Settings):
             self._main_menu()
             self._pause_screen()
             self._game_over()
-            self._check_events()
+            self._check_events(action)
             self._update_screen()
 
-    def _check_events(self):
+    def _check_events(self,action):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        self.player.move()
+        self.player.move(action)
+
         game_time = (pygame.time.get_ticks() // 1000)
         base_score = 30 - game_time + self.menu_duration + self.pause_total
         self.game_score = self.player.coins*3 + base_score
@@ -216,6 +212,11 @@ class Player(Settings):
         else:
             win.blit(self.sprite_sheet.get_image(0, 0, self.scaled_width,
                      self.scaled_height), (self.x, self.y))
+    # def play_step(self,action):
+    #     pass
+    #     #self.move(action)
+    #     #return reward, score
+    #     # add score to player/agents
 
     def move(self, action):
         """Moves the position of the player object."""
