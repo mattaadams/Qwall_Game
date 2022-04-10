@@ -33,7 +33,7 @@ class PlatformGame(Settings):
         self.paused = False
         self.is_game_over = False
         self.pause_total = 0
-        self.game_score = 1
+        self.game_score = 30
 
     def _main_menu(self):
         """Draws a main menu screen"""
@@ -124,10 +124,15 @@ class PlatformGame(Settings):
                 pygame.quit()
                 sys.exit()
         self.player.move(action)
-
+        last_score = self.game_score
         game_time = (pygame.time.get_ticks() // 1000)
+        # how many actions are being recorded per second
+        print(game_time)
         base_score = 30 - game_time + self.menu_duration + self.pause_total
         self.game_score = self.player.coins*3 + base_score
+        reward = self.game_score - last_score # Needs to get delta
+        #print(reward)
+        return reward
 
     def _update_screen(self):
         self.screen.fill(self.bg_color)
@@ -237,8 +242,6 @@ class Player(Settings):
             self.walkCount = 0
 
         if np.array_equal(action, [0, 0, 0, 1]) and self.isJump == False and self.vel_y == 0:
-            print('t')
-            print(self.y)
             self.vel_y = -13.5
             self.isJump = True
 
@@ -294,7 +297,7 @@ level_data = [
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 2, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
