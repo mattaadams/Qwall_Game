@@ -10,9 +10,8 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 
-action = [0, 0, 0, 1]
 
-class PlatformGame(Settings):
+class PlatformGameAI(Settings):
     """PlatformGame class is used to update the screen 
     and check events while the game is running.
 
@@ -34,6 +33,7 @@ class PlatformGame(Settings):
         self.is_game_over = False
         self.pause_total = 0
         self.game_score = 30
+
 
     def _main_menu(self):
         """Draws a main menu screen"""
@@ -97,7 +97,7 @@ class PlatformGame(Settings):
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
-                        self.__init__()  # Reinitialize, is this unsafe?
+                        self.__init__()  # Reinitialize
 
             text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
             subtext_rect = subtext.get_rect(center=(self.screen_width/2, 120+(self.screen_height/2)))
@@ -112,7 +112,7 @@ class PlatformGame(Settings):
         """Runs the game by calling the functions to generate the environment"""
         while self.run:
             self.clock.tick(27)
-            self._main_menu()
+            #self._main_menu()
             self._pause_screen()
             self._game_over()
             self._check_events(action)
@@ -126,12 +126,12 @@ class PlatformGame(Settings):
         self.player.move(action)
         last_score = self.game_score
         game_time = (pygame.time.get_ticks() // 1000)
-        # how many actions are being recorded per second
-        print(game_time)
-        base_score = 30 - game_time + self.menu_duration + self.pause_total
+        base_score = 30 - game_time  + self.pause_total
         self.game_score = self.player.coins*3 + base_score
-        reward = self.game_score - last_score # Needs to get delta
-        #print(reward)
+        if (self.game_score - last_score) > 0: 
+            reward = 3
+        else: 
+            reward = 0
         return reward
 
     def _update_screen(self):
@@ -303,5 +303,5 @@ level_data = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
-platform_game = PlatformGame()
+platform_game = PlatformGameAI()
 platform_game.run_game()

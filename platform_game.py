@@ -302,5 +302,5 @@ level_data = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
-platform_game = PlatformGame()
-platform_game.run_game()
+#platform_game = PlatformGame()
+#platform_game.run_game()
