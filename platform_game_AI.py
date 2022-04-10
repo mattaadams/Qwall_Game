@@ -5,6 +5,12 @@ from settings import Settings
 from game_level import Level
 import numpy as np
 
+# Issues:
+# Event time is currently not long enough for action to complete
+# Seems to be resetting to origin position after each action
+# Reset not working, timer issue
+# Need to update level data properly
+
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -91,6 +97,7 @@ class PlatformGameAI(Settings):
             text = font.render("GAME OVER. Press 'R' to Restart", True, BLACK)
             subtext = font.render(f"Score: {self.game_score}", True, BLACK)
         while self.is_game_over:
+            pass
             self.reset()  # Reinitialize
 
             text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
@@ -102,29 +109,13 @@ class PlatformGameAI(Settings):
 
             pygame.display.update()
     
-    def reset(self):
-        super().__init__()
-        pygame.init()
-        pygame.display.set_caption('Platform Game')
-        self.level = Level(level_data)
-        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
-        self.clock = pygame.time.Clock()
-        self.player = Player(self.level, 40, 720)
-        self.run = True
-        self.menu = True
-        self.paused = False
-        self.is_game_over = False
-        self.pause_total = 0
-        self.game_score = 30
-
 
     def play_event(self,action):
-        self.clock.tick(27)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        print(action)
+        # Currently the player position is not being updated this way
         self.player.move(action)
         last_score = self.game_score
         game_time = 0
@@ -133,6 +124,7 @@ class PlatformGameAI(Settings):
         self.game_score = self.player.coins*3 + base_score
         self._game_over()
         self._update_screen()
+        self.clock.tick(27)
         if (self.game_score - last_score) > 0: 
             reward = 3
         else: 
@@ -298,7 +290,7 @@ level_data = [
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 2, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],

@@ -21,12 +21,11 @@ class Agent():
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
-        x, y = game.player.x, game.player.y
-        agent_position = np.array([x,y])
+        agent_position = np.array([game.player.x,game.player.y])
+        print(agent_position)
         data_array = np.array(game.level.data)
         environment = np.reshape(data_array,(400,))
-        state_data = np.concatenate((agent_position,environment),axis=0)
-        state = state_data
+        state = np.concatenate((agent_position,environment),axis=0)
         # Player coordinates, and what the player is around (can player move left,right,up,down)
         # State of the other 'coins'
         # level (static except for 'coins')
@@ -85,7 +84,6 @@ def train():
 
         if done:
             # train long memory, plot result
-            game.reset()
             agent.n_games += 1
             agent.train_long_memory()
 
