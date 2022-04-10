@@ -33,6 +33,7 @@ class PlatformGameAI(Settings):
         self.is_game_over = False
         self.pause_total = 0
         self.game_score = 30
+        
 
 
     def _main_menu(self):
@@ -81,7 +82,6 @@ class PlatformGameAI(Settings):
     def _game_over(self):
         """Draws the ending screen"""
         font = pygame.font.Font(None, 64)
-        key = pygame.key.get_pressed()
         if self.player.coins == self.level.get_max_coins():
             self.is_game_over = True
             text = font.render("WINNER! Press 'R' to Restart", True, BLACK)
@@ -91,13 +91,7 @@ class PlatformGameAI(Settings):
             text = font.render("GAME OVER. Press 'R' to Restart", True, BLACK)
             subtext = font.render(f"Score: {self.game_score}", True, BLACK)
         while self.is_game_over:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_r:
-                        self.reset()  # Reinitialize
+            self.reset()  # Reinitialize
 
             text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
             subtext_rect = subtext.get_rect(center=(self.screen_width/2, 120+(self.screen_height/2)))
@@ -109,28 +103,36 @@ class PlatformGameAI(Settings):
             pygame.display.update()
     
     def reset(self):
-        self.__init__()
+        super().__init__()
+        pygame.init()
+        pygame.display.set_caption('Platform Game')
+        self.level = Level(level_data)
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        self.clock = pygame.time.Clock()
+        self.player = Player(self.level, 40, 720)
+        self.run = True
+        self.menu = True
+        self.paused = False
+        self.is_game_over = False
+        self.pause_total = 0
+        self.game_score = 30
 
-    def run_game(self,action):
-        """Runs the game by calling the functions to generate the environment"""
-        while self.run:
-            self.clock.tick(27)
-            #self._main_menu()
-            self._pause_screen()
-            self._game_over()
-            self.play_event(action)
-            self._update_screen()
 
     def play_event(self,action):
+        self.clock.tick(27)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+        print(action)
         self.player.move(action)
         last_score = self.game_score
-        game_time = (pygame.time.get_ticks() // 1000)
+        game_time = 0
+        game_time += (pygame.time.get_ticks() // 1000)
         base_score = 30 - game_time  + self.pause_total
         self.game_score = self.player.coins*3 + base_score
+        self._game_over()
+        self._update_screen()
         if (self.game_score - last_score) > 0: 
             reward = 3
         else: 

@@ -3,7 +3,7 @@ import sys
 from animation import SpriteSheet
 from settings import Settings
 from game_level import Level
-import time
+import numpy as np
 # Roadmap:
 # Menu buttons (ai vs non-ai mode)
 # Add leaderboard
@@ -302,5 +302,5 @@ level_data = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
-#platform_game = PlatformGame()
-#platform_game.run_game()
+platform_game = PlatformGame()
+platform_game.run_game()

@@ -17,14 +17,16 @@ class Agent():
         self.epsilon = 0
         self.gamma = 0.8
         self.memory = deque(maxlen=MAX_MEMORY)
-        self.model = Linear_QNet(2, 11, 3)
+        self.model = Linear_QNet(402, 600, 4)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
         x, y = game.player.x, game.player.y
-        tile_list = game.level.tile_list
-
-        state = [x, y]
+        agent_position = np.array([x,y])
+        data_array = np.array(game.level.data)
+        environment = np.reshape(data_array,(400,))
+        state_data = np.concatenate((agent_position,environment),axis=0)
+        state = state_data
         # Player coordinates, and what the player is around (can player move left,right,up,down)
         # State of the other 'coins'
         # level (static except for 'coins')
@@ -72,7 +74,7 @@ def train():
         final_move = agent.get_action(state_old)
 
         # perform move and get new state
-        reward, done, score = game.run_game(final_move)
+        reward, done, score = game.play_event(final_move)
         state_new = agent.get_state(game)
 
         # train short memory
