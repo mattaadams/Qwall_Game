@@ -27,7 +27,7 @@ class PlatformGame(Settings):
         self.level = Level(level_data)
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.clock = pygame.time.Clock()
-        self.player = Player(self.level, 40, 740)
+        self.player = Player(self.level, 40, 720)
         self.run = True
         self.menu = True
         self.paused = False
@@ -237,6 +237,8 @@ class Player(Settings):
             self.walkCount = 0
 
         if np.array_equal(action, [0, 0, 0, 1]) and self.isJump == False and self.vel_y == 0:
+            print('t')
+            print(self.y)
             self.vel_y = -13.5
             self.isJump = True
 

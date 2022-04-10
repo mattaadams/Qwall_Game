@@ -36,7 +36,7 @@ class PlatformGame(Settings):
         self.level = Level(level_data)
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.clock = pygame.time.Clock()
-        self.player = Player(self.level, 40, 740)
+        self.player = Player(self.level, 40, 720)
         self.run = True
         self.menu = True
         self.paused = False
