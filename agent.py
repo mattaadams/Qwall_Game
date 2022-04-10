@@ -1,7 +1,7 @@
 import torch
 import random
 import numpy as np
-from model import Linear_QNet
+from model import Linear_QNet, QTrainer
 from collections import deque
 from platform_game_AI import PlatformGameAI
 
@@ -17,15 +17,14 @@ class Agent():
         self.epsilon = 0
         self.gamma = 0.8
         self.memory = deque(maxlen=MAX_MEMORY)
-        self.model = Linear_QNet(11, 256, 3)
+        self.model = Linear_QNet(2, 11, 3)
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
-        player = game.player
-        level = game.level
+        x, y = game.player.x, game.player.y
         tile_list = game.level.tile_list
 
-        state = []
+        state = [x, y]
         # Player coordinates, and what the player is around (can player move left,right,up,down)
         # State of the other 'coins'
         # level (static except for 'coins')
@@ -49,13 +48,14 @@ class Agent():
 
     def get_action(self, state):
         self.epsilon = 100 - self.n_games
-        
+        final_move = [0, 0, 0, 0]
         if random.randint(0, 200) < self.epsilon:
-            move = random.randint(0, 2)
+            move = random.randint(0, 3)
             final_move[move] = 1
         else:
-            state = torch.tensor(state, dtype=torch.float)
-            prediction = self.model(state)
+            state0 = torch.tensor(state, dtype=torch.float)
+            prediction = self.model(state0)
+            move = torch.argmax(prediction).item()
             final_move[move] = 1
         return final_move
 
@@ -72,7 +72,7 @@ def train():
         final_move = agent.get_action(state_old)
 
         # perform move and get new state
-        reward, done, score = game.play_step(final_move)
+        reward, done, score = game.run_game(final_move)
         state_new = agent.get_state(game)
 
         # train short memory

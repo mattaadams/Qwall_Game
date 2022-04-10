@@ -97,7 +97,7 @@ class PlatformGameAI(Settings):
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
-                        self.__init__()  # Reinitialize
+                        self.reset()  # Reinitialize
 
             text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
             subtext_rect = subtext.get_rect(center=(self.screen_width/2, 120+(self.screen_height/2)))
@@ -107,18 +107,21 @@ class PlatformGameAI(Settings):
             self.screen.blit(subtext, subtext_rect)
 
             pygame.display.update()
+    
+    def reset(self):
+        self.__init__()
 
-    def run_game(self):
+    def run_game(self,action):
         """Runs the game by calling the functions to generate the environment"""
         while self.run:
             self.clock.tick(27)
             #self._main_menu()
             self._pause_screen()
             self._game_over()
-            self._check_events(action)
+            self.play_event(action)
             self._update_screen()
 
-    def _check_events(self,action):
+    def play_event(self,action):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -132,7 +135,7 @@ class PlatformGameAI(Settings):
             reward = 3
         else: 
             reward = 0
-        return reward
+        return reward, self.game_score, self.is_game_over
 
     def _update_screen(self):
         self.screen.fill(self.bg_color)
@@ -217,11 +220,7 @@ class Player(Settings):
         else:
             win.blit(self.sprite_sheet.get_image(0, 0, self.scaled_width,
                      self.scaled_height), (self.x, self.y))
-    # def play_step(self,action):
-    #     pass
-    #     #self.move(action)
-    #     #return reward, score
-    #     # add score to player/agents
+
 
     def move(self, action):
         """Moves the position of the player object."""
@@ -303,5 +302,5 @@ level_data = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
-platform_game = PlatformGameAI()
-platform_game.run_game()
+#platform_game = PlatformGameAI()
+#platform_game.run_game()
