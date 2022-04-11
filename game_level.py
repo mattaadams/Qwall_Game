@@ -1,7 +1,7 @@
 import pygame
 from settings import Settings
 import time
-
+import copy
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
@@ -19,6 +19,8 @@ class Level(Settings):
     def __init__(self, data):
         super().__init__()
         self.tile_list = []
+        self.input_data = copy.deepcopy(data)
+        print(self.input_data)
         self.data = data
         self.coins = 0
     
@@ -40,7 +42,7 @@ class Level(Settings):
                     center = (x+radius, y+radius)
                     color = YELLOW
                     tile = [color, center, radius, self.bg_color, pygame.Rect(
-                        (x, y), (self.tile_size, self.tile_size))]
+                        (x, y), (self.tile_size, self.tile_size)),col_count,row_count]
                     self.tile_list.append(tile)
                     self.coins += 1
                 col_count += 1

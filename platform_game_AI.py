@@ -6,9 +6,7 @@ from game_level import Level
 import numpy as np
 
 # Issues:
-# Event time is currently not long enough for action to complete
-# Seems to be resetting to origin position after each action
-# Reset not working, timer issue
+
 # Need to update level data properly
 
 
@@ -39,7 +37,7 @@ class PlatformGameAI(Settings):
         self.is_game_over = False
         self.pause_total = 0
         self.game_score = 30
-        
+        self.restart_time = 0
 
 
     def _main_menu(self):
@@ -97,7 +95,6 @@ class PlatformGameAI(Settings):
             text = font.render("GAME OVER. Press 'R' to Restart", True, BLACK)
             subtext = font.render(f"Score: {self.game_score}", True, BLACK)
         while self.is_game_over:
-            pass
             self.reset()  # Reinitialize
 
             text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
@@ -109,18 +106,20 @@ class PlatformGameAI(Settings):
 
             pygame.display.update()
     
+    def reset(self):
+        self.__init__()
+        self.restart_time = (pygame.time.get_ticks() // 1000)
+
 
     def play_event(self,action):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        # Currently the player position is not being updated this way
         self.player.move(action)
         last_score = self.game_score
-        game_time = 0
-        game_time += (pygame.time.get_ticks() // 1000)
-        base_score = 30 - game_time  + self.pause_total
+        game_time = (pygame.time.get_ticks() // 1000)
+        base_score = 30 - game_time  + self.pause_total + self.restart_time
         self.game_score = self.player.coins*3 + base_score
         self._game_over()
         self._update_screen()
@@ -129,7 +128,7 @@ class PlatformGameAI(Settings):
             reward = 3
         else: 
             reward = 0
-        return reward, self.game_score, self.is_game_over
+        return reward, self.is_game_over, self.game_score
 
     def _update_screen(self):
         self.screen.fill(self.bg_color)
@@ -235,7 +234,7 @@ class Player(Settings):
             self.walkCount = 0
 
         if np.array_equal(action, [0, 0, 0, 1]) and self.isJump == False and self.vel_y == 0:
-            self.vel_y = -13.5
+            self.vel_y = -14
             self.isJump = True
 
         self.vel_y += 1
@@ -263,6 +262,8 @@ class Player(Settings):
                 if tile[4].colliderect(self.x, self.y, self.width, self.height):
                     self.coins += 1
                     tile[0] = self.bg_color
+                    self.level.input_data[tile[6]][tile[5]] = 0
+                    #print(self.level.data[tile[6]][tile[5]]) #Need to update input
 
             else:
                 pass
@@ -291,10 +292,11 @@ level_data = [
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 2, 1],
+    [1, 0, 0, 0, 0, 1, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 2, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
+
 
 #platform_game = PlatformGameAI()
 #platform_game.run_game()
