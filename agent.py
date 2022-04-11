@@ -1,3 +1,4 @@
+from sys import dont_write_bytecode
 import torch
 import random
 import numpy as np
@@ -22,7 +23,6 @@ class Agent():
 
     def get_state(self, game):
         agent_position = np.array([game.player.x,game.player.y])
-        print(agent_position)
         data_array = np.array(game.level.data)
         environment = np.reshape(data_array,(400,))
         state = np.concatenate((agent_position,environment),axis=0)
@@ -63,6 +63,7 @@ class Agent():
 
 def train():
     agent = Agent()
+    record = 0
     total_score = 0
     game = PlatformGameAI()
     while True:
@@ -81,11 +82,15 @@ def train():
 
         # remember
         agent.remember(state_old, final_move, reward, state_new, done)
-
         if done:
             # train long memory, plot result
+            game.reset()
             agent.n_games += 1
             agent.train_long_memory()
+
+            if score >= record:
+                record = score
+                agent.model.save()
 
 if __name__ == '__main__':
     train()

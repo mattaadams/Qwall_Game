@@ -19,9 +19,7 @@ class Level(Settings):
     def __init__(self, data):
         super().__init__()
         self.tile_list = []
-        self.input_data = copy.deepcopy(data)
-        print(self.input_data)
-        self.data = data
+        self.data = copy.deepcopy(data)
         self.coins = 0
     
 

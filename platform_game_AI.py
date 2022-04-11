@@ -5,9 +5,11 @@ from settings import Settings
 from game_level import Level
 import numpy as np
 
-# Issues:
+# Todo:
+# Check state input, what should be included 
+# rewards for collisision, 
+# improving model, add layers and others stuf
 
-# Need to update level data properly
 
 
 BLACK = (0, 0, 0)
@@ -31,81 +33,9 @@ class PlatformGameAI(Settings):
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.clock = pygame.time.Clock()
         self.player = Player(self.level, 40, 720)
-        self.run = True
-        self.menu = True
-        self.paused = False
-        self.is_game_over = False
-        self.pause_total = 0
         self.game_score = 30
         self.restart_time = 0
 
-
-    def _main_menu(self):
-        """Draws a main menu screen"""
-        key = pygame.key.get_pressed()
-        while self.menu:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_e:
-                        self.menu = False
-            self.screen.fill(self.menu_color)
-            font = pygame.font.Font(None, 64)
-            text = font.render("Press 'E' to Start!", True, BLACK)
-            text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
-            self.screen.blit(text, text_rect)
-            self.menu_duration = pygame.time.get_ticks() // 1000
-            pygame.display.update()
-
-    def _pause_screen(self):
-        """Draws a pause screen"""
-        key = pygame.key.get_pressed()
-        if key[pygame.K_ESCAPE] and self.paused == False and self.menu == False:
-            self.paused = True
-            pause_start_time = pygame.time.get_ticks()
-        while self.paused:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    self.paused = False
-                    self.pause_total += (pygame.time.get_ticks() - pause_start_time) // 1000
-            pause_bg = pygame.Surface((self.screen_width, self.screen_height))
-            pause_bg.set_alpha(10)
-            pause_bg.fill((220, 220, 220))
-            self.screen.blit(pause_bg, (0, 0))
-            font = pygame.font.Font(None, 120)
-            text = font.render("PAUSED", True, BLACK)
-            text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
-            self.screen.blit(text, text_rect)
-            pygame.display.update()
-
-    def _game_over(self):
-        """Draws the ending screen"""
-        font = pygame.font.Font(None, 64)
-        if self.player.coins == self.level.get_max_coins():
-            self.is_game_over = True
-            text = font.render("WINNER! Press 'R' to Restart", True, BLACK)
-            subtext = font.render(f"Score: {self.game_score}", True, BLACK)
-        elif self.game_score == 0:
-            self.is_game_over = True
-            text = font.render("GAME OVER. Press 'R' to Restart", True, BLACK)
-            subtext = font.render(f"Score: {self.game_score}", True, BLACK)
-        while self.is_game_over:
-            self.reset()  # Reinitialize
-
-            text_rect = text.get_rect(center=(self.screen_width/2, self.screen_height/2))
-            subtext_rect = subtext.get_rect(center=(self.screen_width/2, 120+(self.screen_height/2)))
-
-            self.screen.fill(self.bg_color)
-            self.screen.blit(text, text_rect)
-            self.screen.blit(subtext, subtext_rect)
-
-            pygame.display.update()
-    
     def reset(self):
         self.__init__()
         self.restart_time = (pygame.time.get_ticks() // 1000)
@@ -119,16 +49,21 @@ class PlatformGameAI(Settings):
         self.player.move(action)
         last_score = self.game_score
         game_time = (pygame.time.get_ticks() // 1000)
-        base_score = 30 - game_time  + self.pause_total + self.restart_time
+        base_score = 25 - game_time  + self.restart_time
         self.game_score = self.player.coins*3 + base_score
-        self._game_over()
         self._update_screen()
         self.clock.tick(27)
+        game_over = False
+        if self.game_score == 0:
+            game_over = True
+            reward = -10
+
         if (self.game_score - last_score) > 0: 
             reward = 3
         else: 
-            reward = 0
-        return reward, self.is_game_over, self.game_score
+            reward = -1
+            
+        return reward, game_over, self.game_score
 
     def _update_screen(self):
         self.screen.fill(self.bg_color)
@@ -262,8 +197,7 @@ class Player(Settings):
                 if tile[4].colliderect(self.x, self.y, self.width, self.height):
                     self.coins += 1
                     tile[0] = self.bg_color
-                    self.level.input_data[tile[6]][tile[5]] = 0
-                    #print(self.level.data[tile[6]][tile[5]]) #Need to update input
+                    self.level.data[tile[6]][tile[5]] = 0
 
             else:
                 pass
@@ -292,8 +226,8 @@ level_data = [
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [1, 0, 0, 0, 0, 1, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 2, 1],
+    [1, 0, 0, 2, 0, 1, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 2, 0, 0, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 2, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 

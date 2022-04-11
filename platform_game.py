@@ -273,8 +273,7 @@ class Player(Settings):
                 if tile[4].colliderect(self.x, self.y, self.width, self.height):
                     self.coins += 1
                     tile[0] = self.bg_color
-                    self.level.input_data[tile[6]][tile[5]] = 0 #this causes global var to update, need to copy
-                    print('d',self.level.input_data)
+                    self.level.data[tile[6]][tile[5]] = 0 
             else:
                 pass
 
