@@ -6,10 +6,11 @@ from game_level import Level
 import numpy as np
 
 # Todo:
-# Check state input, what should be included
-# rewards for collisision,
+# Check state input, what should be included (I do not think radius would be good for this)
+# Is the agent blind currently
+# LR, memory
+# Add Reward for collision events (-1)
 # improving model, add layers and others stuf
-
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -32,7 +33,8 @@ class PlatformGameAI(Settings):
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.clock = pygame.time.Clock()
         self.player = Player(self.level, 40, 720)
-        self.game_score = 30
+        self.game_timer = 30
+        self.game_score = 0
         self.restart_time = 0
 
     def reset(self):
@@ -47,19 +49,21 @@ class PlatformGameAI(Settings):
         self.player.move(action)
         last_score = self.game_score
         game_time = (pygame.time.get_ticks() // 1000)
-        base_score = 25 - game_time + self.restart_time
-        self.game_score = self.player.coins*3 + base_score
+        self.game_timer = 30 - game_time + self.restart_time
+
+        self.game_score = self.player.coins*3
         self._update_screen()
         self.clock.tick(27)
         game_over = False
-        if self.game_score == 0:
+        # Add Reward for collision events (-1)
+        if self.game_timer == 0:
             game_over = True
             reward = -10
 
         if (self.game_score - last_score) > 0:
             reward = 3
         else:
-            reward = -1
+            reward = -0.5
 
         return reward, game_over, self.game_score
 
@@ -68,9 +72,13 @@ class PlatformGameAI(Settings):
         self.level.draw(self.screen)
         self._draw_grid()
         font = pygame.font.Font(None, 36)
+        time_text = font.render(f'Time: {self.game_timer}', True, (0, 0, 0))
         text = font.render(f'Score: {self.game_score}', True, (0, 0, 0))
-        text_rect = text.get_rect(center=(60, 16))
-        self.screen.blit(text, text_rect)
+        text_rect = time_text.get_rect(center=(60, 16))
+        text_rect2 = text.get_rect(center=(60, 40))
+        self.screen.blit(time_text, text_rect)
+        self.screen.blit(text, text_rect2)
+
         self.player.draw(self.screen)
         pygame.display.update()
 
@@ -219,11 +227,11 @@ level_data = [
     [1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1],
     [1, 0, 0, 2, 0, 1, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 2, 0, 0, 0, 2, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 2, 1],
+    [1, 0, 0, 2, 0, 0, 0, 2, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 2, 1],
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 

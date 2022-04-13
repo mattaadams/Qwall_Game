@@ -43,6 +43,7 @@ class PlatformGame(Settings):
         self.is_game_over = False
         self.pause_total = 0
         self.game_score = 1
+        self.game_timer = 30
 
     def reset(self):
         self.__init__()
@@ -99,7 +100,7 @@ class PlatformGame(Settings):
             self.is_game_over = True
             text = font.render("WINNER! Press 'R' to Restart", True, BLACK)
             subtext = font.render(f"Score: {self.game_score}", True, BLACK)
-        elif self.game_score == 0:
+        elif self.game_timer == 0:
             self.is_game_over = True
             text = font.render("GAME OVER. Press 'R' to Restart", True, BLACK)
             subtext = font.render(f"Score: {self.game_score}", True, BLACK)
@@ -138,17 +139,20 @@ class PlatformGame(Settings):
                 sys.exit()
         self.player.move()
         game_time = (pygame.time.get_ticks() // 1000)
-        base_score = 30 - game_time + self.menu_duration + self.pause_total
-        self.game_score = self.player.coins*3 + base_score
+        self.game_timer = 30 - game_time + self.menu_duration + self.pause_total
+        self.game_score = self.player.coins*3
 
     def _update_screen(self):
         self.screen.fill(self.bg_color)
         self.level.draw(self.screen)
         self._draw_grid()
         font = pygame.font.Font(None, 36)
-        text = font.render(f'Score: {self.game_score}', True, (0, 0, 0))
+        text_time = font.render(f'Time: {self.game_timer}', True, (0, 0, 0))
         text_rect = text.get_rect(center=(60, 16))
-        self.screen.blit(text, text_rect)
+        text = font.render(f'Score: {self.game_score}', True, (0, 0, 0))
+        text_rect2 = text.get_rect(center=(60, 40))
+        self.screen.blit(text_time, text_rect)
+        self.screen.blit(text, text_rect2)
         self.player.draw(self.screen)
         pygame.display.update()
 
