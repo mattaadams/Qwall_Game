@@ -22,10 +22,10 @@ class Agent():
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)
 
     def get_state(self, game):
-        agent_position = np.array([game.player.x,game.player.y])
+        agent_position = np.array([game.player.x, game.player.y])
         data_array = np.array(game.level.data)
-        environment = np.reshape(data_array,(400,))
-        state = np.concatenate((agent_position,environment),axis=0)
+        environment = np.reshape(data_array, (400,))
+        state = np.concatenate((agent_position, environment), axis=0)
         # Player coordinates, and what the player is around (can player move left,right,up,down)
         # State of the other 'coins'
         # level (static except for 'coins')
@@ -36,7 +36,7 @@ class Agent():
 
     def train_long_memory(self):
         if len(self.memory) > BATCH_SIZE:
-            mini_sample = random.sample(self.memory, BATCH_SIZE) # list of tuples
+            mini_sample = random.sample(self.memory, BATCH_SIZE)  # list of tuples
         else:
             mini_sample = self.memory
 
@@ -45,7 +45,6 @@ class Agent():
 
     def train_short_memory(self, state, action, reward, next_state, done):
         self.trainer.train_step(state, action, reward, next_state, done)
-
 
     def get_action(self, state):
         self.epsilon = 100 - self.n_games
@@ -91,6 +90,7 @@ def train():
             if score >= record:
                 record = score
                 agent.model.save()
+
 
 if __name__ == '__main__':
     train()

@@ -6,10 +6,9 @@ from game_level import Level
 import numpy as np
 
 # Todo:
-# Check state input, what should be included 
-# rewards for collisision, 
+# Check state input, what should be included
+# rewards for collisision,
 # improving model, add layers and others stuf
-
 
 
 BLACK = (0, 0, 0)
@@ -22,7 +21,7 @@ class PlatformGameAI(Settings):
     and check events while the game is running.
 
     Attributes:
-    
+
     """
 
     def __init__(self):
@@ -40,8 +39,7 @@ class PlatformGameAI(Settings):
         self.__init__()
         self.restart_time = (pygame.time.get_ticks() // 1000)
 
-
-    def play_event(self,action):
+    def play_event(self, action):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -49,7 +47,7 @@ class PlatformGameAI(Settings):
         self.player.move(action)
         last_score = self.game_score
         game_time = (pygame.time.get_ticks() // 1000)
-        base_score = 25 - game_time  + self.restart_time
+        base_score = 25 - game_time + self.restart_time
         self.game_score = self.player.coins*3 + base_score
         self._update_screen()
         self.clock.tick(27)
@@ -58,11 +56,11 @@ class PlatformGameAI(Settings):
             game_over = True
             reward = -10
 
-        if (self.game_score - last_score) > 0: 
+        if (self.game_score - last_score) > 0:
             reward = 3
-        else: 
+        else:
             reward = -1
-            
+
         return reward, game_over, self.game_score
 
     def _update_screen(self):
@@ -75,7 +73,6 @@ class PlatformGameAI(Settings):
         self.screen.blit(text, text_rect)
         self.player.draw(self.screen)
         pygame.display.update()
-        
 
     def _draw_grid(self):
         grid_range = self.screen_width // self.tile_size
@@ -127,7 +124,7 @@ class Player(Settings):
 
         Args:
             win: Pygame display object
-        
+
         """
 
         image_right = self.sprite_sheet.get_image(
@@ -148,7 +145,6 @@ class Player(Settings):
         else:
             win.blit(self.sprite_sheet.get_image(0, 0, self.scaled_width,
                      self.scaled_height), (self.x, self.y))
-
 
     def move(self, action):
         """Moves the position of the player object."""
@@ -233,4 +229,4 @@ level_data = [
 
 
 #platform_game = PlatformGameAI()
-#platform_game.run_game()
+# platform_game.run_game()

@@ -26,7 +26,7 @@ class PlatformGame(Settings):
     and check events while the game is running.
 
     Attributes:
-    
+
     """
 
     def __init__(self):
@@ -43,7 +43,7 @@ class PlatformGame(Settings):
         self.is_game_over = False
         self.pause_total = 0
         self.game_score = 1
-    
+
     def reset(self):
         self.__init__()
         self.level = Level(level_data)
@@ -151,7 +151,6 @@ class PlatformGame(Settings):
         self.screen.blit(text, text_rect)
         self.player.draw(self.screen)
         pygame.display.update()
-        
 
     def _draw_grid(self):
         grid_range = self.screen_width // self.tile_size
@@ -203,7 +202,7 @@ class Player(Settings):
 
         Args:
             win: Pygame display object
-        
+
         """
 
         image_right = self.sprite_sheet.get_image(
@@ -273,7 +272,7 @@ class Player(Settings):
                 if tile[4].colliderect(self.x, self.y, self.width, self.height):
                     self.coins += 1
                     tile[0] = self.bg_color
-                    self.level.data[tile[6]][tile[5]] = 0 
+                    self.level.data[tile[6]][tile[5]] = 0
             else:
                 pass
 

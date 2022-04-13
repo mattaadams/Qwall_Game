@@ -21,7 +21,6 @@ class Level(Settings):
         self.tile_list = []
         self.data = copy.deepcopy(data)
         self.coins = 0
-    
 
         row_count = 0
         for row in data:
@@ -40,7 +39,7 @@ class Level(Settings):
                     center = (x+radius, y+radius)
                     color = YELLOW
                     tile = [color, center, radius, self.bg_color, pygame.Rect(
-                        (x, y), (self.tile_size, self.tile_size)),col_count,row_count]
+                        (x, y), (self.tile_size, self.tile_size)), col_count, row_count]
                     self.tile_list.append(tile)
                     self.coins += 1
                 col_count += 1
