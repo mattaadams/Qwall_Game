@@ -2,12 +2,38 @@
 
 ### Using Reinforcement Learning in Video Games
 
+### About
+
+
 #### Libraries Used
 - PyGame
-- PyTorch
-- .test
+- Keras
+- Tensorflow
+- OpenCV2
+- PIL
+- NumPy
 
-#### Other Software Used
+
+#### Actions and Inputs
+  
+##### Actions
+ -  Up
+ -  Down
+ -  None
+
+##### Inputs
+
+
+#### Rewards
  
- -  (?) 
- -  (?)
+ -  Pass through Wall + 1 
+ -  Hit Wall - -10
+ -  
+
+
+#### Model Architecture
+ 
+ -  
+
+#### Training and Saving
+

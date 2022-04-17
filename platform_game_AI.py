@@ -4,13 +4,16 @@ from animation import SpriteSheet
 from settings import Settings
 from game_level import Level
 import numpy as np
+from collections import deque
+from PIL import Image
+import cv2
 
-# Todo:
-# Check state input, what should be included (I do not think radius would be good for this)
-# Is the agent blind currently
-# LR, memory
-# Add Reward for collision events (-1)
-# improving model, add layers and others stuf
+# Roadmap:
+# Menu buttons (ai vs non-ai mode)
+# Add leaderboard
+# model viz
+
+# Issue, the hole in wall is changing afterwards
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -18,7 +21,7 @@ YELLOW = (255, 255, 0)
 
 
 class PlatformGameAI(Settings):
-    """PlatformGame class is used to update the screen 
+    """PlatformGame class is used to update the screen
     and check events while the game is running.
 
     Attributes:
@@ -32,67 +35,87 @@ class PlatformGameAI(Settings):
         self.level = Level(level_data)
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.clock = pygame.time.Clock()
-        self.player = Player(self.level, 40, 720)
-        self.game_timer = 30
+        self.SIZE = 12
+        self.ACTION_SPACE_SIZE = 3
+        self.OBSERVATION_SPACE_VALUES = (self.SIZE, self.SIZE, 3)
+        self.PLAYER_N = 3  # player key in dict
+        self.player = Player(self.level, 40, 320)
         self.game_score = 0
-        self.restart_time = 0
+        self.d = {0: (0, 0, 0),
+                  1: (255, 255, 255),
+                  2: (0, 255, 255),
+                  3: (0, 0, 255)}
 
     def reset(self):
-        self.__init__()
-        self.restart_time = (pygame.time.get_ticks() // 1000)
+        self.episode_step = 0
+        state = np.array(self.get_image())
+        self.level = Level(level_data)
+        self.wall = Wall(self.level)
+        self.player = Player(self.level, 40, 320)
+        self.game_score = 0
+        return state
 
-    def play_event(self, action):
+    def step(self, action):
+        self.episode_step += 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        self.player.move(action)
-        last_score = self.game_score
-        game_time = (pygame.time.get_ticks() // 1000)
-        self.game_timer = 30 - game_time + self.restart_time
-
-        self.game_score = self.player.coins*3
+        game_over = self.player.move(action)
+        self.wall.move()
+        if self.wall.x <= self.wall.speed:
+            self.game_score += 1
+            reward = 1
+        new_state = np.array(self.get_image())
         self._update_screen()
         self.clock.tick(27)
-        game_over = False
-        # Add Reward for collision events (-1)
-        if self.game_timer == 0:
-            game_over = True
+        if game_over == True:
             reward = -10
-
-        if (self.game_score - last_score) > 0:
-            reward = 3
+            self.reset()
         else:
-            reward = -0.5
-
-        return reward, game_over, self.game_score
+            reward = 0
+        return new_state, reward, game_over
 
     def _update_screen(self):
         self.screen.fill(self.bg_color)
         self.level.draw(self.screen)
         self._draw_grid()
         font = pygame.font.Font(None, 36)
-        time_text = font.render(f'Time: {self.game_timer}', True, (0, 0, 0))
         text = font.render(f'Score: {self.game_score}', True, (0, 0, 0))
-        text_rect = time_text.get_rect(center=(60, 16))
-        text_rect2 = text.get_rect(center=(60, 40))
-        self.screen.blit(time_text, text_rect)
-        self.screen.blit(text, text_rect2)
-
+        text_rect = text.get_rect(center=(60, 20))
+        self.screen.blit(text, text_rect)
+        self.wall.draw(self.screen)
         self.player.draw(self.screen)
         pygame.display.update()
 
     def _draw_grid(self):
-        grid_range = self.screen_width // self.tile_size
+        dim = max(self.screen_height, self.screen_width)
+        grid_range = dim // self.tile_size
         for line in range(0, grid_range):
             pygame.draw.line(
                 self.screen, WHITE,
                 (0, line * self.tile_size),
-                (self.screen_width, line * self.tile_size))
+                (dim, line * self.tile_size))
             pygame.draw.line(
                 self.screen, WHITE,
                 (line * self.tile_size, 0),
-                (line * self.tile_size, self.screen_width))
+                (line * self.tile_size, dim))
+
+    def get_image(self):
+        env = np.zeros((self.SIZE, self.SIZE, 3), dtype=np.uint8)  # starts an rbg of our size
+        for i, row in enumerate(self.level.data):
+            for j, col in enumerate(self.level.data):
+                env[i][j] = self.d[self.level.data[i][j]]
+        # sets the player tile to red
+        env[self.player.y//self.tile_size][self.player.x//self.tile_size] = self.d[self.PLAYER_N]
+        img = Image.fromarray(env, 'RGB')
+        return img
+
+    def render(self):
+        img = self.get_image()
+        img = img.resize((300, 300))
+        cv2.imshow("image", np.array(img))
+        cv2.waitKey(5)
 
 
 class Player(Settings):
@@ -100,30 +123,25 @@ class Player(Settings):
 
     Attributes:
         level: A `Level` object
-        x: An integer
-        y: An integer
-        width: An integer
-        height: An integer
+        x: An integer representing player's x-coordinate
+        y: An integer representing player's y-coordinate
+        width: An integer representing player's width
+        height: An integer representing player's height
 
     """
 
-    def __init__(self, level, x, y, width=21, height=40):
+    def __init__(self, level, x, y, width=40, height=40):
         super().__init__()
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.vel_y = 0
-        self.vel_x = 8
-        self.isJump = False
+        self.vel_y = 40
+        self.vel_x = 40
         self.left = False
         self.right = False
-        self.walkCount = 0
-        self.sprite_sheet = SpriteSheet('assets/stick_man_blue.png')
-        self.scale_factor = self.sprite_sheet.scale_factor
-        self.scaled_width = self.width * self.scale_factor
-        self.scaled_height = self.height * self.scale_factor
-        self.frame = 0
+        self.up = False
+        self.down = False
         self.level = level
         self.coins = 0
 
@@ -134,107 +152,103 @@ class Player(Settings):
             win: Pygame display object
 
         """
-
-        image_right = self.sprite_sheet.get_image(
-            self.scaled_width*self.frame, self.scaled_height*self.frame, self.scaled_width, self.scaled_height)
-        image_left = self.sprite_sheet.get_image_hflip(
-            self.scaled_width*self.frame, self.scaled_height*self.frame, self.scaled_width, self.scaled_height)
-
-        if self.walkCount + 1 >= 21:
-            self.walkCount = 0
-        if self.left:
-            win.blit(image_left, (self.x, self.y))
-            self.walkCount += 1
-            self.frame = self.walkCount//3
-        elif self.right:
-            win.blit(image_right, (self.x, self.y))
-            self.walkCount += 1
-            self.frame = self.walkCount//3
-        else:
-            win.blit(self.sprite_sheet.get_image(0, 0, self.scaled_width,
-                     self.scaled_height), (self.x, self.y))
+        pygame.draw.rect(win, (255, 0, 0), (self.x, self.y, self.width, self.height))
 
     def move(self, action):
         """Moves the position of the player object."""
+        game_over = False
         dx = 0
         dy = 0
-        # [Left, Right, Stop, Jump]
-        if np.array_equal(action, [1, 0, 0, 0]) and self.x > self.vel_x:
-            dx -= self.vel_x
-            self.left = True
-            self.right = False
-        if np.array_equal(action, [0, 1, 0, 0]) and self.x < self.screen_width - self.width - self.vel_x:
-            dx += self.vel_x
-            self.left = False
-            self.right = True
-        elif np.array_equal(action, [0, 0, 1, 0]):
-            self.left = False
-            self.right = False
-            self.walkCount = 0
 
-        if np.array_equal(action, [0, 0, 0, 1]) and self.isJump == False and self.vel_y == 0:
-            self.vel_y = -14
-            self.isJump = True
-
-        self.vel_y += 1
-        if self.vel_y > 8:
-            self.vel_y = 8
-        dy += self.vel_y
+        # if action == 0 and self.x > 0:
+        #     dx -= self.vel_x
+        #     self.right = self.up = self.down = False
+        #     self.left = True
+        # elif action == 1 and self.x < self.screen_width - self.width:
+        #     dx += self.vel_x
+        #     self.left = self.up = self.down = False
+        #     self.right = True
+        if action == 0 and self.y > 0:
+            dy -= self.vel_y
+            self.left = self.right = self.down = False
+            self.up = True
+        elif action == 1 and self.y < self.screen_height - self.height:
+            dy += self.vel_y
+            self.left = self.up = self.right = False
+            self.down = True
+        elif action == 2:
+            self.left = False
+            self.right = False
+            self.up = False
+            self.down = False
 
         for tile in self.level.tile_list:
             if tile[0] == BLACK:
-                if tile[1].colliderect(self.x + dx, self.y, self.width, self.height):
+                if tile[1].colliderect(self.x, self.y, self.width, self.height):
                     dx = 0
-                if tile[1].colliderect(self.x, self.y + dy, self.width, self.height):
+                    game_over = True
+                if tile[1].colliderect(self.x, self.y, self.width, self.height):
+                    game_over = True
 
-                    if self.vel_y < 0:
-                        dy = tile[1].bottom - self.y
-                        self.vel_y = 0
-                    elif self.vel_y >= 0:
-                        dy = tile[1].top - (self.y+self.height)
-                        self.vel_y = 0
-                        self.isJump = False
-                if self.y < 0:
-                    dy = 0 - self.y
-                    self.vel_y = 0
             elif tile[0] == YELLOW:
                 if tile[4].colliderect(self.x, self.y, self.width, self.height):
                     self.coins += 1
                     tile[0] = self.bg_color
                     self.level.data[tile[6]][tile[5]] = 0
-
             else:
-                pass
+                continue
 
         self.x += dx
         self.y += dy
+        return game_over
 
 
-# Level data size = (tile_size/width,tile_size/height)
-# each element represents a tile
-level_data = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1],
-    [2, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 2, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 2, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1],
-    [1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
-    [1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 2],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1],
-    [1, 0, 0, 2, 0, 1, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 2, 0, 0, 0, 2, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 2, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-]
+class Wall(Settings):
+    """The Wall Class represents a player inside the game.
+
+    Attributes:
+        level: A `Level` object
+        x: An integer representing player's x-coordinate
+        y: An integer representing player's y-coordinate
+        width: An integer representing player's width
+        height: An integer representing player's height
+
+    """
+
+    def __init__(self, level):
+        super().__init__()
+        self.x = self.screen_width
+        self.y = 0
+        self.level = level
+        self.speed = 20
+        self.hole_size = 4
+        self.hole_position = 4
+        self.body = np.ones((1, self.screen_height//self.tile_size))
+
+    def draw(self, win):
+        """Creates a drawing of the wall object on the game screen
+
+        Args:
+            win: Pygame display object
+
+        """
+        self.level.data = np.zeros((12, 12))
+        self.level.data[:, (self.x-1)//self.tile_size] = 1
+        a = self.hole_position
+        b = self.hole_size
+        self.level.data[a:a+b, (self.x-1)//self.tile_size] = 0
+        if self.x <= self.speed:
+            self.hole_size, self.hole_position = self.create_hole()
+            self.x = self.screen_width
+
+    def move(self):
+        """Moves the position of the wall object."""
+        self.x -= self.speed
+
+    def create_hole(self):
+        self.hole_size = np.random.randint(2, 6)
+        self.hole_position = np.random.randint(0, 11)
+        return self.hole_size, self.hole_position
 
 
-#platform_game = PlatformGameAI()
-# platform_game.run_game()
+level_data = np.zeros((12, 12))
