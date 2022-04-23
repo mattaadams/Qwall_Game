@@ -3,9 +3,8 @@
 ### Using Reinforcement Learning in Video Games
 
 ### About
-
   
-<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Wall_Game.png" align="center" height="240" width="240" ></a>
+<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Wall_Game.png" align="center" height="200" width="200" ></a>
 
 
 #### Libraries Used
@@ -31,6 +30,7 @@
  
  -  Pass through Wall `+ 1` 
  -  Hit Wall  `- 10`
+ -  Anything Else `0`
   
 
 #### Model 

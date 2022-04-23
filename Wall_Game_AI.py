@@ -8,12 +8,6 @@ from collections import deque
 from PIL import Image
 import cv2
 
-# Roadmap:
-# Menu buttons (ai vs non-ai mode)
-# Add leaderboard
-# model viz
-
-# Issue, the hole in wall is changing afterwards
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -31,7 +25,7 @@ class PlatformGameAI(Settings):
     def __init__(self):
         super().__init__()
         pygame.init()
-        pygame.display.set_caption('Platform Game')
+        pygame.display.set_caption('Wall Game')
         self.level = Level(level_data)
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.clock = pygame.time.Clock()
@@ -57,6 +51,7 @@ class PlatformGameAI(Settings):
 
     def step(self, action):
         self.episode_step += 1
+        reward = 0
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -72,8 +67,7 @@ class PlatformGameAI(Settings):
         if game_over == True:
             reward = -10
             self.reset()
-        else:
-            reward = 0
+
         return new_state, reward, game_over
 
     def _update_screen(self):
@@ -102,6 +96,9 @@ class PlatformGameAI(Settings):
                 (line * self.tile_size, dim))
 
     def get_image(self):
+        """Gets an image representation of our state to be used
+        by the Deep-Q Network
+        """
         env = np.zeros((self.SIZE, self.SIZE, 3), dtype=np.uint8)  # starts an rbg of our size
         for i, row in enumerate(self.level.data):
             for j, col in enumerate(self.level.data):
@@ -112,6 +109,8 @@ class PlatformGameAI(Settings):
         return img
 
     def render(self):
+        """Resizes and displays the image so we can view the state
+        """
         img = self.get_image()
         img = img.resize((300, 300))
         cv2.imshow("image", np.array(img))
@@ -137,9 +136,6 @@ class Player(Settings):
         self.width = width
         self.height = height
         self.vel_y = 40
-        self.vel_x = 40
-        self.left = False
-        self.right = False
         self.up = False
         self.down = False
         self.level = level
@@ -157,39 +153,25 @@ class Player(Settings):
     def move(self, action):
         """Moves the position of the player object."""
         game_over = False
-        dx = 0
         dy = 0
 
-        # if action == 0 and self.x > 0:
-        #     dx -= self.vel_x
-        #     self.right = self.up = self.down = False
-        #     self.left = True
-        # elif action == 1 and self.x < self.screen_width - self.width:
-        #     dx += self.vel_x
-        #     self.left = self.up = self.down = False
-        #     self.right = True
         if action == 0 and self.y > 0:
             dy -= self.vel_y
-            self.left = self.right = self.down = False
             self.up = True
+            self.down = False
         elif action == 1 and self.y < self.screen_height - self.height:
             dy += self.vel_y
-            self.left = self.up = self.right = False
+            self.up = False
             self.down = True
         elif action == 2:
-            self.left = False
-            self.right = False
             self.up = False
             self.down = False
 
         for tile in self.level.tile_list:
             if tile[0] == BLACK:
                 if tile[1].colliderect(self.x, self.y, self.width, self.height):
-                    dx = 0
                     game_over = True
-                if tile[1].colliderect(self.x, self.y, self.width, self.height):
-                    game_over = True
-
+  
             elif tile[0] == YELLOW:
                 if tile[4].colliderect(self.x, self.y, self.width, self.height):
                     self.coins += 1
@@ -198,7 +180,6 @@ class Player(Settings):
             else:
                 continue
 
-        self.x += dx
         self.y += dy
         return game_over
 

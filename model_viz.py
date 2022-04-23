@@ -2,6 +2,12 @@ from tensorflow.keras.callbacks import TensorBoard
 
 
 class ModifiedTensorBoard(TensorBoard):
+    """ModifiedTensorboard class is used to record statistics 
+    while the model is training
+
+    Attributes:
+
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

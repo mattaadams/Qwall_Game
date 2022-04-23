@@ -1,7 +1,7 @@
 
 
 class Settings():
-    """Description Goes here
+    """Initializes settings for the game
 
     Attributes:
 

@@ -23,14 +23,13 @@ class Level(Settings):
         self.coins = 0
 
     def draw(self, screen):
-        """Draws the tiles onto the game screen
+        """Places and Draws the tiles onto the game screen
 
         Args:
             screen: Pygame display object
 
         """
         row_count = 0
-        # print(self.data)
         self.tile_list = []
         for row in self.data:
             col_count = 0
