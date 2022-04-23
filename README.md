@@ -9,12 +9,11 @@
 
 
 #### Libraries Used
-- PyGame
-- Keras
-- Tensorflow
-- OpenCV2
-- PIL
-- NumPy
+
+- PyGame 2.1.2
+- Tensorflow 2.8.0
+- OpenCV2 4.4.0
+- Pillow 8.0.1
 
 
 #### Actions and Inputs
