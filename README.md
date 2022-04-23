@@ -1,4 +1,4 @@
-# Personal Project -- Spring 2022
+# Q-Wall Game
 
 ### Using Reinforcement Learning in Video Games
 
