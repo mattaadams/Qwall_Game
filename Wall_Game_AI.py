@@ -14,8 +14,8 @@ WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 
 
-class PlatformGameAI(Settings):
-    """PlatformGame class is used to update the screen
+class WallGameAI(Settings):
+    """WallGame class is used to update the screen
     and check events while the game is running.
 
     Attributes:
@@ -171,7 +171,7 @@ class Player(Settings):
             if tile[0] == BLACK:
                 if tile[1].colliderect(self.x, self.y, self.width, self.height):
                     game_over = True
-  
+
             elif tile[0] == YELLOW:
                 if tile[4].colliderect(self.x, self.y, self.width, self.height):
                     self.coins += 1

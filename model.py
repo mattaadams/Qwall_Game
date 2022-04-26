@@ -10,13 +10,14 @@ from tqdm import tqdm
 import os
 from PIL import Image
 import cv2
-import pygame
-import sys
-from animation import SpriteSheet
-from settings import Settings
-from game_level import Level
 from Wall_Game_AI import WallGameAI
 from model_viz import ModifiedTensorBoard
+
+MODEL_NAME = 'ConvNet_2x256'
+env = WallGameAI()
+random.seed(1)
+np.random.seed(1)
+tf.random.set_seed(1)
 
 
 class DQNAgent:
@@ -54,7 +55,7 @@ class DQNAgent:
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Dropout(0.2))
 
-        model.add(Conv2D(256, (3, 3), Activation='relu'))
+        model.add(Conv2D(256, (3, 3)))
         model.add(Activation('relu'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Dropout(0.2))
@@ -111,25 +112,17 @@ class DQNAgent:
         return self.model.predict(np.array(state).reshape(-1, *state.shape)/255)[0]
 
 
-env = WallGameAI()
-
-random.seed(1)
-np.random.seed(1)
-tf.random.set_seed(1)
-
-
 class QTrainer():
 
-    def __init__(self, name='ConvNet_2x256', episodes=10_000, epsilon=1, epsilon_decay=0.99975, agg_stats_freq=20,
+    def __init__(self, episodes=10_000, epsilon=1, epsilon_decay=0.99975, agg_stats_freq=20,
                  max_reward=20, min_epsilon=0.001):
-        self.name = name
         self.agent = DQNAgent()
         self.episodes = episodes
         self.epsilon = epsilon
         self.epsilon_decay = epsilon_decay
-        self.self.agg_stats_freq = self.agg_stats_freq
+        self.agg_stats_freq = agg_stats_freq
         self.max_reward = max_reward
-        self.self.min_epsilon = self.min_epsilon
+        self.min_epsilon = min_epsilon
 
     def run(self):
         if not os.path.isdir('models'):
@@ -138,7 +131,7 @@ class QTrainer():
         for episode in tqdm(range(1, self.episodes + 1), ascii=True, unit='episodes'):
 
             # Update tensorboard step every episode
-            agent.tensorboard.step = episode
+            self.agent.tensorboard.step = episode
 
             # Restart episode
             episode_reward = 0
@@ -147,8 +140,8 @@ class QTrainer():
             done = False
             while not done:
 
-                if np.random.random() > epsilon:
-                    action = np.argmax(agent.get_qs(current_state))
+                if np.random.random() > self.epsilon:
+                    action = np.argmax(self.agent.get_qs(current_state))
                 else:
                     action = np.random.randint(0, env.ACTION_SPACE_SIZE)
 
@@ -173,14 +166,18 @@ class QTrainer():
             if episode == self.episodes:
                 agent.model.save(f'models/model{int(time.time())}.model')
 
-        def save_stats(self):
-            average_reward = sum(self.ep_rewards[-self.agg_stats_freq:])/len(self.ep_rewards[-self.agg_stats_freq:])
-            min_reward = min(self.ep_rewards[-self.agg_stats_freq:])
-            max_reward = max(self.ep_rewards[-self.agg_stats_freq:])
-            agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward,
-                                           reward_max=max_reward, epsilon=self.epsilon)
+    def save_stats(self):
+        average_reward = sum(self.ep_rewards[-self.agg_stats_freq:])/len(self.ep_rewards[-self.agg_stats_freq:])
+        min_reward = min(self.ep_rewards[-self.agg_stats_freq:])
+        max_reward = max(self.ep_rewards[-self.agg_stats_freq:])
+        self.agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward,
+                                            reward_max=max_reward, epsilon=self.epsilon)
 
-            # Save model only when max reward is greater or equal a set value
-            if max_reward >= self.max_reward:
-                agent.model.save(
-                    f'models/{self.name}_{average_reward:_>7.2f}avg_{int(time.time())}.model')
+        # Save model only when max reward is greater or equal a set value
+        if max_reward >= self.max_reward:
+            agent.model.save(
+                f'models/{MODEL_NAME}_{average_reward:_7.2f}avg_{int(time.time())}.model')
+
+
+trainer = QTrainer()
+trainer.run()
