@@ -15,6 +15,7 @@ import cv2
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
+BLUE = (0, 0, 255)
 
 
 class WallGame(Settings):
@@ -149,7 +150,7 @@ class WallGame(Settings):
         self.level.draw(self.screen)
         self._draw_grid()
         font = pygame.font.Font(None, 36)
-        text = font.render(f'Score: {self.game_score}', True, (0, 0, 0))
+        text = font.render(f'Score: {self.game_score}', True, BLUE)
         text_rect = text.get_rect(center=(60, 20))
         self.screen.blit(text, text_rect)
         self.wall.draw(self.screen)
@@ -171,7 +172,7 @@ class WallGame(Settings):
 
     def get_image(self):
         # creates an array representing the size of our environment
-        env = np.zeros((self.SIZE, self.SIZE, 3), dtype=np.uint8)  
+        env = np.zeros((self.SIZE, self.SIZE, 3), dtype=np.uint8)
         for x, row in enumerate(self.level.data):
             for y, col in enumerate(self.level.data):
                 env[x][y] = self.d[self.level.data[x][y]]
@@ -183,7 +184,7 @@ class WallGame(Settings):
     def render(self):
         img = self.get_image()
         img = img.resize((300, 300))  # resizing so we can view the state
-        cv2.imshow("image", np.array(img))  
+        cv2.imshow("image", np.array(img))
         cv2.waitKey(5)
 
 
@@ -295,7 +296,6 @@ class Player(Settings):
                 if tile[1].colliderect(self.x, self.y, self.width, self.height):
                     dx = 0
                     game_over = True
-                
 
             elif tile[0] == YELLOW:
                 if tile[4].colliderect(self.x, self.y, self.width, self.height):
@@ -326,7 +326,6 @@ class Wall(Settings):
         self.hole_size = 4
         self.hole_position = 4
         self.body = np.ones((1, self.screen_height//self.tile_size))
- 
 
     def draw(self, win):
         """Creates a drawing of the wall object on the game screen

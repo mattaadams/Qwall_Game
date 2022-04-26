@@ -12,6 +12,7 @@ import cv2
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
+BLUE = (0, 0, 255)
 
 
 class WallGameAI(Settings):
@@ -75,7 +76,7 @@ class WallGameAI(Settings):
         self.level.draw(self.screen)
         self._draw_grid()
         font = pygame.font.Font(None, 36)
-        text = font.render(f'Score: {self.game_score}', True, (0, 0, 0))
+        text = font.render(f'Score: {self.game_score}', True, BLUE)
         text_rect = text.get_rect(center=(60, 20))
         self.screen.blit(text, text_rect)
         self.wall.draw(self.screen)
