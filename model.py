@@ -89,7 +89,7 @@ class DQNAgent:
         for index, (current_state, action, reward, new_current_state, done) in enumerate(minibatch):
             if not done:
                 max_future_q = np.max(future_qs_list[index])
-                new_q = reward + DISCOUNT * max_future_q
+                new_q = reward + self.discount * max_future_q
             else:
                 new_q = reward
 

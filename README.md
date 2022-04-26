@@ -4,10 +4,19 @@
 
 ### About
   
-<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Wall_Game.png" align="center" height="200" width="200" ></a>
+First Episode
+
+<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Wall_Game_Ep0.gif" align="center" height="200" width="200" ></a>
+
+Last Episode (10,000)
+
+<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Wall_Game.gif" align="center" height="200" width="200" ></a>
+
+<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Max_Reward.png" align="center" height="200" width="200" ></a>
 
 
-#### Libraries Used
+
+#### Libraries Required
 
 - PyGame 2.1.2
 - Tensorflow 2.8.0
