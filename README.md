@@ -1,6 +1,6 @@
 # Q-Wall Game
 
-### Using Reinforcement Learning in Video Games
+### Applying Reinforcement Learning in Video Games
 
 ### About
   
@@ -12,9 +12,11 @@ Last Episode (10,000)
 
 <a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Wall_Game.gif" align="center" height="200" width="200" ></a>
 
-<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Max_Reward.png" align="center" height="200" width="200" ></a>
+Max Reward
 
+<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Max_Reward.png" align="center" height="240" ></a>
 
+<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Loss.png" align="center" height="240" ></a>
 
 #### Libraries Required
 
@@ -45,6 +47,4 @@ Last Episode (10,000)
 #### Model 
  
  -  
-
-#### Training and Saving
 
