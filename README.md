@@ -14,9 +14,11 @@ Last Episode (10,000)
 
 Max Reward
 
-<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Max_Reward.png" align="center" height="240" ></a>
+<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Max_Reward.png" align="center" width="300" ></a>
 
-<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Loss.png" align="center" height="240" ></a>
+<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Loss.png" align="center" width="300" ></a>
+
+<a href="url"><img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Epsilon.png" align="center" width="300" ></a>
 
 #### Libraries Required
 
