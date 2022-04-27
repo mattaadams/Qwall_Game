@@ -45,7 +45,7 @@ Max Reward        | Loss
 ## Model and Policy
 
 
-<img src="[drawing.jpg](https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Epsilon.png)" alt="Epsilon" width="400"/>
+<img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Epsilon.png" alt="Epsilon" width="400"/>
 
 
 # Usage
