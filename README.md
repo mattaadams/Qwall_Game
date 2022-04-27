@@ -11,7 +11,7 @@ This project contains code to train a model that automatically avoids the wall o
 
 First Episode           |  Last Episode (10,000)
 :-------------------------:|:-------------------------:
-![First Episode](https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Wall_Game.gif)  |  ![Last Episode](https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Wall_Game.gif)
+![First Episode](https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Wall_Game_Ep0.gif)  |  ![Last Episode](https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Wall_Game.gif)
 
 
 
@@ -44,10 +44,11 @@ Max Reward        | Loss
 
 ## Model and Policy
 
-Epsilon        |
-:-------------------------:
-![Epsilon](https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Epsilon.png)  
 
+<img src="[drawing.jpg](https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Epsilon.png)" alt="Epsilon" width="400"/>
+
+
+# Usage
 
 ## Libraries Required
 
