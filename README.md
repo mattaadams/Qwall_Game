@@ -48,9 +48,10 @@ Max Reward        | Loss
 
 ### Model
 
-<img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/model.png" alt="Model" />
+<img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/model.png" alt="Model" height="500" />
 
 Trainable params: 613,891
+
 ### Policy
 
 The Agent Policy is decaying epsilon-greedy, which starts at epsilon=1.0 and decays that down to under 0.1 by the 10,000th episode.
