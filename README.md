@@ -48,7 +48,7 @@ Max Reward        | Loss
 
 ### Model
 
-<img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/model.png" alt="Model" height="500" />
+<img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/model.png" alt="Model" height="700" />
 
 Trainable params: 613,891
 
