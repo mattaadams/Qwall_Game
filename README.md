@@ -65,7 +65,12 @@ The Agent Policy is decaying epsilon-greedy, which starts at epsilon=1.0 and dec
 
 - PyGame 2.1.2
 - TensorFlow 2.8.0
-- OpenCV2 4.4.0
+- opencv-python 4.5.5.64
 - Pillow 8.0.1
+- NumPy 1.22.3
+- tqdm-4.64.0
 
+## Setup
 
+1. git clone `https://github.com/mattaadams/Qwall_Game.git`
+2. pip install -e .

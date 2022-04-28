@@ -356,5 +356,3 @@ class Wall(Settings):
 
 
 level_data = np.zeros((12, 12))
-platform_game = PlatformGame()
-platform_game.run_game()

@@ -20,14 +20,14 @@ np.random.seed(1)
 tf.random.set_seed(1)
 
 
-class DQNAgent:
+class DQNAgent():
     """The DQNAgent class
 
     Attributes: 
         discount: Float, scaling of future rewards
         replay_memory: Integer,How many last steps to keep for model training
         min_replay_memory: Integer, Minimum number of steps in a memory to start training
-        minibatch_size:Integer,How many steps (samples) to use for training
+        minibatch_size: Integer,How many steps (samples) to use for training
         update_freq: Integer,Terminal states (end of episodes)
         """
 
@@ -111,10 +111,19 @@ class DQNAgent:
 
 
 class QTrainer():
+    """Attributes: 
+        agent: object
+        episodes: integer
+        epsilon: float
+        epsilon_decay: float,
+        agg_stats_freq: integer,
+        max_reward: integer, threshold for maximum reward for model to save
+        min_epsilon: float, minimum value for epsilon
+        """
 
-    def __init__(self, episodes=10_000, epsilon=1, epsilon_decay=0.99975, agg_stats_freq=20,
+    def __init__(self, agent=DQNAgent(), episodes=10_000, epsilon=1.0, epsilon_decay=0.99975, agg_stats_freq=20,
                  max_reward=20, min_epsilon=0.001):
-        self.agent = DQNAgent()
+        self.agent = agent
         self.episodes = episodes
         self.epsilon = epsilon
         self.epsilon_decay = epsilon_decay
@@ -175,7 +184,3 @@ class QTrainer():
         if max_reward >= self.max_reward:
             agent.model.save(
                 f'models/{MODEL_NAME}_{average_reward:_7.2f}avg_{int(time.time())}.model')
-
-
-trainer = QTrainer()
-trainer.run()

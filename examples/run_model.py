@@ -3,9 +3,10 @@ from tensorflow.keras.models import load_model
 
 from Wall_Game_AI import WallGameAI
 
+# Runs the game with a pre-trained model
 
 model_name_ = "model1650751087.model"
-model = load_model(f'models/{model_name_}')
+model = load_model(f'../models/{model_name_}')
 
 game = WallGameAI()
 
