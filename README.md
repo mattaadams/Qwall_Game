@@ -26,10 +26,12 @@ Max Reward        | Loss
 ## Inputs, Outputs, and Actions
   
 ### Inputs
- - Environment State - 12x12 RGB Image of environment
+ - Environment State - (12,12,3) RGB Image of environment
 
 ### Outputs
 
+ - Reward + Discounted Q-value of next State
+  
 ### Actions
  -  Up
  -  Down
@@ -37,13 +39,21 @@ Max Reward        | Loss
 
 ## Rewards/Punishments
  
- -  Pass through Wall `+ 1` 
+ -  Pass By Wall `+ 1` 
  -  Hit Wall  `- 10`
  -  Anything Else `0`
   
 
 ## Model and Policy
 
+### Model
+
+<img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/model.png" alt="Model" />
+
+Trainable params: 613,891
+### Policy
+
+The Agent Policy is decaying epsilon-greedy, which starts at epsilon=1.0 and decays that down to under 0.1 by the 10,000th episode.
 
 <img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Epsilon.png" alt="Epsilon" width="400"/>
 
@@ -53,7 +63,7 @@ Max Reward        | Loss
 ## Libraries Required
 
 - PyGame 2.1.2
-- Tensorflow 2.8.0
+- TensorFlow 2.8.0
 - OpenCV2 4.4.0
 - Pillow 8.0.1
 

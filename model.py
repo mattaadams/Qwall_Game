@@ -50,13 +50,11 @@ class DQNAgent:
         model = Sequential()
 
         # OBSERVATION_SPACE_VALUES = (12, 12, 3) - our 12x12 RGB image.
-        model.add(Conv2D(256, (3, 3), input_shape=env.OBSERVATION_SPACE_VALUES))
-        model.add(Activation('relu'))
+        model.add(Conv2D(256, (3, 3), input_shape=env.OBSERVATION_SPACE_VALUES, activation='relu'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Dropout(0.2))
 
-        model.add(Conv2D(256, (3, 3)))
-        model.add(Activation('relu'))
+        model.add(Conv2D(256, (3, 3), activation='relu'))
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Dropout(0.2))
 
