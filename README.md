@@ -59,7 +59,7 @@ The Agent Policy is decaying epsilon-greedy, which starts at epsilon=1.0 and dec
 <img src="https://github.com/mattaadams/RL_Wall_Game/blob/master/assets/Epsilon.png" alt="Epsilon" width="400"/>
 
 
-# Usage
+# Requirements and Setup
 
 ## Libraries Required
 
@@ -72,5 +72,10 @@ The Agent Policy is decaying epsilon-greedy, which starts at epsilon=1.0 and dec
 
 ## Setup
 
-1. git clone `https://github.com/mattaadams/Qwall_Game.git`
-2. pip install -e .
+1. Ensure conda is up-to-date: ```conda update conda```
+2. Create and activate new conda environment
+3. run ```git clone https://github.com/mattaadams/Qwall_Game.git```
+4. run ```pip install -e .```
+
+
+
